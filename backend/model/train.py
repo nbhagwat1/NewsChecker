@@ -24,13 +24,31 @@ def get_content(link):
     
     website_content = response.text
     website_code = BeautifulSoup(website_content, 'html.parser')
-    print(website_code)
+    website_title = website_code.title.string
+
+    website_text = ""
+    text_list = []
+    for tag in website_code(["script", "meta", "header", "footer"]):
+        tag.decompose()
+    
+
+    if (bool(website_code.find_all("article"))):
+        website_list = website_code.find_all("article")
+        for element in website_list:
+            text_list.append(element.get_text(strip=True, separator="\n"))
+        website_text = "\n".join(text_list)
+    elif (bool(website_code.find_all("main"))):
+        website_list = website_code.find_all("main")
+        for element in website_list:
+            text_list.append(element.get_text(strip=True, separator="\n"))
+        website_text = "\n".join(text_list)
+    else:
+        website_text = website_code.get_text()
+    
+    return website_text
 
 def main():
-    try:
-        get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832")
-    except Exception as e:
-        print("Exception occurred: ", e, flush=True)
+    get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832")
 
 if __name__ == "__main__":
     main()
