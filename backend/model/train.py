@@ -15,7 +15,6 @@ def get_link(link):
         print("Not a link")
         exit(0)
     
-
 def get_content(link):
     response = requests.get(link)
     if (response.status_code != 200):
@@ -47,8 +46,13 @@ def get_content(link):
     
     return website_text
 
+def analyze_tone(text):
+    # model: SentenceTransformers - all-mpnet-base-v2
+    
+    return text
+
 def main():
-    get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832")
+    print(get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832"))
 
 if __name__ == "__main__":
     main()
