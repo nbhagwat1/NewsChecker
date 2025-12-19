@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 
+article_title = ""
+
 def get_link(link):
     link = link.strip().lower()
 
@@ -14,7 +16,7 @@ def get_link(link):
     if empty_count > 0 or dot_count == 0:
         print("Not a link")
         exit(0)
-    
+
 def get_content(link):
     response = requests.get(link)
     if (response.status_code != 200):
@@ -24,6 +26,7 @@ def get_content(link):
     website_content = response.text
     website_code = BeautifulSoup(website_content, 'html.parser')
     website_title = website_code.title.string
+    article_title = website_title
 
     website_text = ""
     text_list = []
@@ -45,6 +48,12 @@ def get_content(link):
         website_text = website_code.get_text()
     
     return website_text
+
+def analyze_language(text):
+    # Use FastText to determine the text's language
+    # Use HuggingFace / NLLB to translate the text
+
+    return text
 
 def analyze_tone(text):
     # model: SentenceTransformers - all-mpnet-base-v2
