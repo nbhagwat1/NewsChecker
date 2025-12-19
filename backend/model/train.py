@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+from sentence_transformers import SentenceTransformer
+import fastText
 
 article_title = ""
 
