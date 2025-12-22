@@ -50,18 +50,27 @@ def get_content(link):
     else:
         website_text = website_code.get_text()
     
-    return website_text
+    return website_text 
 
 def analyze_language(text):
     # Use FastText to determine the text's language
     # Use HuggingFace / NLLB to translate the text
 
+    new_text = ""
+    for char in text:
+        if char != "\n":
+            new_text += char
+
     language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
     detection_model = fasttext.load_model(language_model)
-    language = detection_model.predict(text)
-    
-    return language
 
+    language_tuple = detection_model.predict(new_text)
+    language = language_tuple[0][0][9:12]
+
+    if (language.lower() != "eng"):
+        x = 1
+    
+    return text
 
 def analyze_tone(text):
     # model: SentenceTransformers - all-mpnet-base-v2
