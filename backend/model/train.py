@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
-import fastText
+import fasttext
+from huggingface_hub import hf_hub_download
 
 article_title = ""
 
@@ -55,7 +56,12 @@ def analyze_language(text):
     # Use FastText to determine the text's language
     # Use HuggingFace / NLLB to translate the text
 
-    return text
+    language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
+    detection_model = fasttext.load_model(language_model)
+    language = detection_model.predict(text)
+    
+    return language
+
 
 def analyze_tone(text):
     # model: SentenceTransformers - all-mpnet-base-v2
@@ -63,7 +69,8 @@ def analyze_tone(text):
     return text
 
 def main():
-    print(get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832"))
+    text = get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832")
+    print(analyze_language(text))
 
 if __name__ == "__main__":
     main()
