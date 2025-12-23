@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
 import fasttext
 from huggingface_hub import hf_hub_download
+from transformers import pipeline
 
 article_title = ""
 
@@ -68,7 +69,7 @@ def analyze_language(text):
     language = language_tuple[0][0][9:12]
 
     if (language.lower() != "eng"):
-        x = 1
+        translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
     
     return text
 
