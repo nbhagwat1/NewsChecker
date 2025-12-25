@@ -61,6 +61,8 @@ def analyze_language(text):
     for char in text:
         if char != "\n":
             new_text += char
+        else: 
+            new_text += " "
 
     language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
     detection_model = fasttext.load_model(language_model)
@@ -68,9 +70,27 @@ def analyze_language(text):
     language_tuple = detection_model.predict(new_text)
     language = language_tuple[0][0][9:12]
 
+    final_text = new_text
     if (language.lower() != "eng"):
         translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
     
+        line_list = []
+        for line in text:
+            line_list.append(line)
+        
+        paragraph = ""
+        total_words = 0
+        paragraph_list = []
+        for line in line_list:
+            total_words += len(line.split())
+            if total_words > 250:
+                paragraph_list.append(paragraph)
+                paragraph = line
+                total_words = 0
+            else:
+                paragraph += line
+        paragraph_list.append(paragraph)
+
     return text
 
 def analyze_tone(text):
@@ -80,7 +100,7 @@ def analyze_tone(text):
 
 def main():
     text = get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832")
-    print(analyze_language(text))
+    analyze_language(text)
 
 if __name__ == "__main__":
     main()
