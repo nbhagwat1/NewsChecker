@@ -34,7 +34,7 @@ def get_content(link):
 
     website_text = ""
     text_list = []
-    for tag in website_code(["script", "meta", "header", "footer"]):
+    for tag in website_code(["script", "meta", "header", "footer", "img"]):
         tag.decompose()
     
 
@@ -71,11 +71,11 @@ def analyze_language(text):
     language = language_tuple[0][0][9:12]
 
     final_text = new_text
-    if (language.lower() != "eng"):
+    if (language.lower() == "eng"):
         translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
     
         line_list = []
-        for line in text:
+        for line in text.split("\n"):
             line_list.append(line)
         
         paragraph = ""
@@ -85,12 +85,18 @@ def analyze_language(text):
             total_words += len(line.split())
             if total_words > 250:
                 paragraph_list.append(paragraph)
-                paragraph = line
+                paragraph = line + " "
                 total_words = 0
             else:
-                paragraph += line
+                paragraph += line + " "
         paragraph_list.append(paragraph)
 
+        x = 1
+        for paragraph in paragraph_list:
+            print("Paragraph ", x)
+            print(paragraph)
+            print("\n")
+            x += 1
     return text
 
 def analyze_tone(text):
