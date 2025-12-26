@@ -71,7 +71,7 @@ def analyze_language(text):
     language = language_tuple[0][0][9:12]
 
     final_text = new_text
-    if (language.lower() == "eng"):
+    if (language.lower() != "eng"):
         translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
     
         line_list = []
@@ -91,13 +91,20 @@ def analyze_language(text):
                 paragraph += line + " "
         paragraph_list.append(paragraph)
 
-        x = 1
+        translated_text = ""
         for paragraph in paragraph_list:
-            print("Paragraph ", x)
-            print(paragraph)
-            print("\n")
-            x += 1
-    return text
+            new_paragraph = ""
+            for char in paragraph:
+                if char != "\n":
+                    new_paragraph += char
+                else:
+                    new_paragraph += " "
+            translated_paragraph = translation_tool(new_paragraph, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
+            translated_text += translated_paragraph[0]['translation_text']
+            translated_text += " "
+        final_text = translated_text
+    
+    return final_text
 
 def analyze_tone(text):
     # model: SentenceTransformers - all-mpnet-base-v2
@@ -105,8 +112,7 @@ def analyze_tone(text):
     return text
 
 def main():
-    text = get_content("https://www.today.com/style/see-people-s-choice-awards-red-carpet-looks-t141832")
-    analyze_language(text)
+    print(analyze_language("Hola a todos. Me llamo Nikhil y los quiero. Mi cosa favorita para hacer es jugar videojuegos y comer espaguetis."))
 
 if __name__ == "__main__":
     main()
