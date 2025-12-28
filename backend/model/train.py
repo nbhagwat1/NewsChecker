@@ -108,11 +108,16 @@ def analyze_language(text):
 
 def analyze_tone(text):
     # model: SentenceTransformers - all-mpnet-base-v2
+    # Use SentenceTransformers to convert text into an embedding
+    # Use 
+
+    tone_model = SentenceTransformer("all-mpnet-base-v2")
     
     return text
 
 def main():
-    print(analyze_language("Hola a todos. Me llamo Nikhil y los quiero. Mi cosa favorita para hacer es jugar videojuegos y comer espaguetis."))
+    analyze_language("Hola a todos. Me llamo Nikhil y los quiero. Mi cosa favorita para hacer es jugar videojuegos y comer espaguetis.")
+    analyze_tone("Hi")
 
 if __name__ == "__main__":
     main()
