@@ -110,6 +110,7 @@ def analyze_tone(text):
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
     # Use 
+    # This article is written in a way that is less careful about knowledge
 
     tone_model = SentenceTransformer("all-mpnet-base-v2")
     
