@@ -184,6 +184,43 @@
                     "paragraph": ""
                 }
             ]
+        },
+        {
+            "factor_name": "neutral",
+            "paragraphs": [
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                },
+                {
+                    "source": "",
+                    "paragraph": ""
+                }
+            ]
         }
     ]
 }
