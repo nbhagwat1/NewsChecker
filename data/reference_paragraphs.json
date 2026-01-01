@@ -4,24 +4,29 @@
             "factor_name": "excessive_emotional_intensity",
             "paragraphs": [
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://usatalkin.com/this-just-happened-rachel-maddow-calls-security-to-remove-karoline-leavitt-after-explosive-revelation-on-air-what-was-said-that-shook-the-entire-studio-intense-plot-the-conversation-between/",
+                    "paragraph": "A live broadcast of The Rachel Maddow Show took an unexpected and chaotic turn Monday night when guest Karoline Leavitt, a rising conservative commentator and former Trump campaign spokesperson, made a shocking on-air accusation against one of Maddow’s MSNBC colleagues. The explosive moment left the entire studio stunned and forced Maddow to call for security, resulting in Leavitt’s removal from the set in real time.",
+                    "emotional_intensity_score": 6
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://people.com/shocking-revelations-from-celebrity-memoirs-11774426",
+                    "paragraph": "These jaw-dropping tales came straight from the stars who lived them. In their memoirs, these celebrities got real, sharing some of the most shocking events to transpire in their lives. From horrific events such as Brooke Shields' labia rejuvenation to Rebel Wilson's surprisingly low salary from Bridesmaids to Al Pacino's First Lady faux pas, these bombshells had us buzzing the second the book hit shelves.",
+                    "emotional_intensity_score": 9
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://www.mediaite.com/media/news/11-most-shocking-damning-and-weird-revelations-from-the-dojs-new-165-page-bombshell-motion-in-trumps-election-case/",
+                    "paragraph": "Wednesday afternoon’s news cycle saw the chatter about the previous night’s vice presidential debate overwhelmed by a 165-page stack of paper, after Judge Tanya Chutkan unsealed a bombshell motion filed by Special Counsel Jack Smith in the election interference case against former President Donald Trump.",
+                    "emotional_intensity_score": 4
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://www.mediaite.com/media/news/11-most-shocking-damning-and-weird-revelations-from-the-dojs-new-165-page-bombshell-motion-in-trumps-election-case/",
+                    "paragraph": "Trump had objected to the release of this motion, arguing that its release would constitute interference in the upcoming November election. Multiple commentators viewed the filing as Smith’s effort to lay out some of the evidence in advance of a trial that has been repeatedly delayed — and may never happen if Trump is re-elected and successfully directs his DOJ appointees to drop the case. The fact of the November election being only 34 days looms large over the impact this filing may potentially have.",
+                    "emotional_intensity_score": 0
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://www.newstarget.com/2025-03-20-shocking-discovery-giza-pyramids-revealed-as-tip-of-the-iceberg.html",
+                    "paragraph": "In a revelation that could rewrite the history books, a groundbreaking discovery beneath the Giza pyramid complex has stunned archaeologists and historians worldwide. Advanced synthetic aperture radar (SAR) technology has unveiled a colossal underground structure extending up to two kilometers deep, far beyond the visible pyramids. This discovery, published in a 2022 study, suggests that the iconic pyramids are merely the surface of a highly sophisticated, ancient engineering marvel. The findings challenge mainstream Egyptology and raise profound questions about the existence of an advanced pre-historic civilization—or even extraterrestrial intervention in Earth's history.",
+                    "emotional_intensity_score": 6
                 },
                 {
                     "source": "",
