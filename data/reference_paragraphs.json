@@ -29,16 +29,24 @@
                     "emotional_intensity_score": 6
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://studyfinds.org/fossils-largest-snake-in-history/",
+                    "paragraph": "Scientists from the Indian Institute of Technology Roorkee have unearthed a collection of well-preserved vertebrae that likely belong to a gigantic prehistoric snake. Terrifyingly, the study suggests this snake, which was longer than a school bus, likely resembled and attacked just like a modern-day anaconda.",
+                    "emotional_intensity_score": 3
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://www.newindiaabroad.com/english/news/another-indian-invader-of-canada-us-influencer-mocks-death-of-indian-man-in-canada",
+                    "paragraph": "A row has erupted after a U.S.-based influencer mocked the death of an Indian man in Canada, using racially charged language that triggered widespread outrage on social media.",
+                    "emotional_intensity_score": 7
                 },
                 {
-                    "source": "",
-                    "paragraph": ""
+                    "source": "https://www.ibtimes.co.uk/wikipedia-faces-backlash-over-attempt-delete-page-ukrainian-refugees-killing-1743565",
+                    "paragraph": "The stabbing death of 23-year-old Ukrainian refugee Iryna Zarutska on a Charlotte train shocked many, but it is the internet storm that followed which has turned her case into a global flashpoint.",
+                    "emotional_intensity_score": 8
+                },
+                {
+                    "source": "https://www.nbcnews.com/world/israel/israel-gaza-aid-doctors-without-borders-operations-suspended-rcna251495",
+                    "paragraph": "The Ministry of Diaspora Affairs said the organizations that will be banned on Jan. 1 did not meet new requirements for sharing staff, funding and operations information.",
+                    "emotional_intensity_score": 1
                 }
             ]
         },
