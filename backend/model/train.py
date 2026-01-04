@@ -7,7 +7,7 @@ from transformers import pipeline
 
 article_title = ""
 
-def get_link(link):
+def examine_link(link):
     link = link.strip().lower()
 
     empty_count = 0
@@ -106,11 +106,9 @@ def analyze_language(text):
     
     return final_text
 
-def analyze_tone(text):
+def create_embeddings(text):
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
-    # Use 
-    # This article is written in a way that is less careful about knowledge
 
     tone_model = SentenceTransformer("all-mpnet-base-v2")
     
@@ -118,7 +116,6 @@ def analyze_tone(text):
 
 def main():
     analyze_language("Hola a todos. Me llamo Nikhil y los quiero. Mi cosa favorita para hacer es jugar videojuegos y comer espaguetis.")
-    analyze_tone("Hi")
 
 if __name__ == "__main__":
     main()
