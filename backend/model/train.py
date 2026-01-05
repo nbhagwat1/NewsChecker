@@ -8,6 +8,7 @@ from transformers import pipeline
 
 article_title = ""
 original_text = ""
+cleaned_text = ""
 
 def examine_link(link):
     link = link.strip().lower()
@@ -57,6 +58,11 @@ def get_content(link):
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
     website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
     website_text = website_text.strip() # removes any whitespace from the text
+    cleaned_text = website_text
+
+    if len(website_text) == 0:
+        print("Text cleanup failed")
+        exit(0)
 
     return website_text 
 
