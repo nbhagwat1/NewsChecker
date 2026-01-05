@@ -1,4 +1,5 @@
 import requests
+import re
 from bs4 import BeautifulSoup
 from sentence_transformers import SentenceTransformer
 import fasttext
@@ -6,6 +7,7 @@ from huggingface_hub import hf_hub_download
 from transformers import pipeline
 
 article_title = ""
+original_text = ""
 
 def examine_link(link):
     link = link.strip().lower()
@@ -34,7 +36,7 @@ def get_content(link):
 
     website_text = ""
     text_list = []
-    for tag in website_code(["script", "meta", "header", "footer", "img"]):
+    for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style"]):
         tag.decompose()
     
 
@@ -51,6 +53,11 @@ def get_content(link):
     else:
         website_text = website_code.get_text()
     
+    original_text = website_text
+    website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
+    website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
+    website_text = website_text.strip() # removes any whitespace from the text
+
     return website_text 
 
 def analyze_language(text):
@@ -115,7 +122,7 @@ def create_embeddings(text):
     return text
 
 def main():
-    analyze_language("Hola a todos. Me llamo Nikhil y los quiero. Mi cosa favorita para hacer es jugar videojuegos y comer espaguetis.")
+    print("Hi")
 
 if __name__ == "__main__":
     main()
