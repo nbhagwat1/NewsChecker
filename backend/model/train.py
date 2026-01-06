@@ -1,6 +1,6 @@
 import requests
 import re
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 from sentence_transformers import SentenceTransformer
 import fasttext
 from huggingface_hub import hf_hub_download
@@ -37,9 +37,18 @@ def get_content(link):
 
     website_text = ""
     text_list = []
-    for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style"]):
+    for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
-    
+    for tag in website_code.find_all(True):
+        if isinstance(tag, Tag) == False:
+            continue
+        if not tag.attrs:
+            continue
+        class_list = tag.get('class', [])
+        for class_name in class_list:
+            if "metadata" in class_name.lower():
+                tag.decompose()
+                break
 
     if (bool(website_code.find_all("article"))):
         website_list = website_code.find_all("article")
