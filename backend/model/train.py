@@ -28,7 +28,16 @@ def get_content(link):
     
     website_content = response.text
     website_code = BeautifulSoup(website_content, 'html.parser')
-    website_title = website_code.title.string
+
+    heading = website_code.find("h1") # CHANGE - May not be safe to use later
+    if heading:
+        website_title = heading.get_text(strip=True)
+        heading.decompose()
+    else:
+        if website_code.title and website_code.title.string:
+            website_title = website_code.title.string
+        else:
+            website_title = ""
 
     website_text = ""
     text_list = []
@@ -61,19 +70,21 @@ def get_content(link):
                 tag.decompose()
                 break
 
+    paragraph_list = []
     if (bool(website_code.find_all("article"))):
         website_list = website_code.find_all("article")
-        for element in website_list:
-            text_list.append(element.get_text(strip=True, separator="\n"))
-        website_text = "\n".join(text_list)
+        for article in website_list:
+            for paragraph in article.find_all("p"):
+                paragraph_list.append(paragraph)
     elif (bool(website_code.find_all("main"))):
         website_list = website_code.find_all("main")
-        for element in website_list:
-            text_list.append(element.get_text(strip=True, separator="\n"))
-        website_text = "\n".join(text_list)
+        for main in website_list:
+            for paragraph in main.find_all("p"):
+                paragraph_list.append(paragraph)
     else:
-        website_text = website_code.get_text()
-    
+        paragraph_list = website_code.find_all("p")
+    website_text = " ".join(paragraph_list)
+
     original_text = website_text
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
     website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
