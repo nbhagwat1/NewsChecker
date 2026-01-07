@@ -6,7 +6,8 @@ def main():
     i = 1
     for link in link_list:
         print("Link ", i)
-        print(get_content(link))
+        a, b, c, d, e, f = get_content(link)
+        print(d)
         print("\n")
         i += 1
 

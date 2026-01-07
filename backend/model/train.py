@@ -42,6 +42,7 @@ def get_content(link):
     website_text = ""
     text_list = []
     time_list = []
+    footer_information = []
     for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
     for tag in website_code("time"):
@@ -69,20 +70,38 @@ def get_content(link):
             if "footnote" in class_name.lower():
                 tag.decompose()
                 break
+            if "caption" in class_name.lower():
+                tag.decompose()
+                break
+            if "byline" in class_name.lower():
+                tag.decompose()
+                break
+            if "subscribe" in class_name.lower():
+                tag.decompose()
+                break
+            if "newsletter" in class_name.lower():
+                tag.decompose()
+                break
+            if "footer" in class_name.lower():
+                footer_information.append(tag.get_text(strip=True))
+                tag.decompose()
+                break
 
     paragraph_list = []
     if (bool(website_code.find_all("article"))):
         website_list = website_code.find_all("article")
         for article in website_list:
             for paragraph in article.find_all("p"):
-                paragraph_list.append(paragraph)
+                paragraph_list.append(paragraph.get_text(" ", strip=True))
     elif (bool(website_code.find_all("main"))):
         website_list = website_code.find_all("main")
         for main in website_list:
             for paragraph in main.find_all("p"):
-                paragraph_list.append(paragraph)
+                paragraph_list.append(paragraph.get_text(" ", strip=True))
     else:
-        paragraph_list = website_code.find_all("p")
+        website_list = website_code.find_all("p")
+        for paragraph in website_list:
+            paragraph_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
     original_text = website_text
@@ -95,7 +114,7 @@ def get_content(link):
         print("Text cleanup failed")
         exit(0)
 
-    return website_text, website_title, original_text, cleaned_text
+    return website_text, website_title, original_text, cleaned_text, time_list, footer_information
 
 def analyze_language(text):
     # Use FastText to determine the text's language
