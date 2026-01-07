@@ -6,10 +6,6 @@ import fasttext
 from huggingface_hub import hf_hub_download
 from transformers import pipeline
 
-article_title = ""
-original_text = ""
-cleaned_text = ""
-
 def examine_link(link):
     link = link.strip().lower()
 
@@ -33,11 +29,14 @@ def get_content(link):
     website_content = response.text
     website_code = BeautifulSoup(website_content, 'html.parser')
     website_title = website_code.title.string
-    article_title = website_title
 
     website_text = ""
     text_list = []
+    time_list = []
     for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
+        tag.decompose()
+    for tag in website_code("time"):
+        time_list.append(tag.get_text(strip=True))
         tag.decompose()
     for tag in website_code.find_all(True):
         if isinstance(tag, Tag) == False:
@@ -47,6 +46,18 @@ def get_content(link):
         class_list = tag.get('class', [])
         for class_name in class_list:
             if "metadata" in class_name.lower():
+                tag.decompose()
+                break
+            if "social-link" in class_name.lower():
+                tag.decompose()
+                break
+            if "social-share" in class_name.lower():
+                tag.decompose()
+                break
+            if "follow-topics" in class_name.lower():
+                tag.decompose()
+                break
+            if "footnote" in class_name.lower():
                 tag.decompose()
                 break
 
@@ -73,7 +84,7 @@ def get_content(link):
         print("Text cleanup failed")
         exit(0)
 
-    return website_text 
+    return website_text, website_title, original_text, cleaned_text
 
 def analyze_language(text):
     # Use FastText to determine the text's language
