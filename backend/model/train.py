@@ -54,38 +54,30 @@ def get_content(link):
         if not tag.attrs:
             continue
         class_list = tag.get('class', [])
-        for class_name in class_list:
-            if "metadata" in class_name.lower():
-                tag.decompose()
-                break
-            if "social-link" in class_name.lower():
-                tag.decompose()
-                break
-            if "social-share" in class_name.lower():
-                tag.decompose()
-                break
-            if "follow-topics" in class_name.lower():
-                tag.decompose()
-                break
-            if "footnote" in class_name.lower():
-                tag.decompose()
-                break
-            if "caption" in class_name.lower():
-                tag.decompose()
-                break
-            if "byline" in class_name.lower():
-                tag.decompose()
-                break
-            if "subscribe" in class_name.lower():
-                tag.decompose()
-                break
-            if "newsletter" in class_name.lower():
-                tag.decompose()
-                break
-            if "footer" in class_name.lower():
-                footer_information.append(tag.get_text(strip=True))
-                tag.decompose()
-                break
+        data = tag.get("data-testid")
+        important_words = ["metadata", "social-link", "social-share", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline"]
+        decomposed = False
+
+        if data or class_list:
+            if data:
+                for word in important_words:
+                    if word in data.lower():
+                        if word == "footer":
+                            footer_information.append(tag.get_text(strip=True))
+                        tag.decompose()
+                        decomposed = True
+                        break
+            if not decomposed and class_list: 
+                for class_name in class_list:
+                    for word in important_words:
+                        if word in class_name.lower():
+                            if word == "footer":
+                                footer_information.append(tag.get_text(strip=True))
+                            tag.decompose()
+                            decomposed = True
+                            break
+                    if decomposed:
+                        break
 
     paragraph_list = []
     if (bool(website_code.find_all("article"))):
