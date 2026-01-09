@@ -42,11 +42,15 @@ def get_content(link):
     website_text = ""
     text_list = []
     time_list = []
+    emphasized_text_list = []
     footer_information = []
     for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
     for tag in website_code("time"):
         time_list.append(tag.get_text(strip=True))
+        tag.decompose()
+    for tag in website_code("em"):
+        emphasized_text_list.append(tag.get_text(strip=True))
         tag.decompose()
     for tag in website_code.find_all(True):
         if isinstance(tag, Tag) == False:
@@ -106,7 +110,7 @@ def get_content(link):
         print("Text cleanup failed")
         exit(0)
 
-    return website_text, website_title, original_text, cleaned_text, time_list, footer_information
+    return website_text, website_title, original_text, cleaned_text, time_list, footer_information, emphasized_text_list
 
 def analyze_language(text):
     # Use FastText to determine the text's language
