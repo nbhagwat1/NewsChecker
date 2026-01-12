@@ -44,6 +44,8 @@ def get_content(link):
     time_list = []
     emphasized_text_list = []
     footer_information = []
+    recommended_list = []
+    tag_list = []
     for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
     for tag in website_code("time"):
@@ -51,7 +53,9 @@ def get_content(link):
         tag.decompose()
     for tag in website_code("em"):
         emphasized_text_list.append(tag.get_text(strip=True))
-        tag.decompose()
+    for tag in website_code("li"):
+        if not tag.find_all(["p", "span"]):
+            tag.decompose()  
     for tag in website_code.find_all(True):
         if isinstance(tag, Tag) == False:
             continue
@@ -59,7 +63,7 @@ def get_content(link):
             continue
         class_list = tag.get('class', [])
         data = tag.get("data-testid")
-        important_words = ["metadata", "social-link", "social-share", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline"]
+        important_words = ["metadata", "social-link", "social-share", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button"]
         decomposed = False
 
         if data or class_list:
@@ -68,6 +72,11 @@ def get_content(link):
                     if word in data.lower():
                         if word == "footer":
                             footer_information.append(tag.get_text(strip=True))
+                        if word == "recommended":
+                            if tag.name != "div" and tag.name != "section":
+                                break
+                            else:
+                                recommended_list.append(tag.get_text(strip=True))
                         tag.decompose()
                         decomposed = True
                         break
@@ -77,6 +86,11 @@ def get_content(link):
                         if word in class_name.lower():
                             if word == "footer":
                                 footer_information.append(tag.get_text(strip=True))
+                            if word == "recommended":
+                                if tag.name != "div" and tag.name != "section":
+                                    break
+                                else:
+                                    recommended_list.append(tag.get_text(strip=True))
                             tag.decompose()
                             decomposed = True
                             break
@@ -87,15 +101,15 @@ def get_content(link):
     if (bool(website_code.find_all("article"))):
         website_list = website_code.find_all("article")
         for article in website_list:
-            for paragraph in article.find_all("p"):
+            for paragraph in article.find_all(["p", "ul", "ol"]):
                 paragraph_list.append(paragraph.get_text(" ", strip=True))
     elif (bool(website_code.find_all("main"))):
         website_list = website_code.find_all("main")
         for main in website_list:
-            for paragraph in main.find_all("p"):
+            for paragraph in main.find_all(["p", "ul", "ol"]):
                 paragraph_list.append(paragraph.get_text(" ", strip=True))
     else:
-        website_list = website_code.find_all("p")
+        website_list = website_code.find_all(["p", "ul", "ol"])
         for paragraph in website_list:
             paragraph_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
