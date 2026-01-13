@@ -21,12 +21,18 @@ def examine_link(link):
         exit(0)
 
 def get_content(link):
-    response = requests.get(link)
+    headers = {
+        "User-Agent": "NewsChecker/1.0 (learning project)"
+    }
+
+    response = requests.get(link, headers=headers, timeout=10)
     if (response.status_code != 200):
+        print(response.status_code)
         print("HTTP request failed")
         exit(0)
     
     website_content = response.text
+    # print(website_content)
     website_code = BeautifulSoup(website_content, 'html.parser')
 
     heading = website_code.find("h1") # CHANGE - May not be safe to use later
@@ -48,6 +54,7 @@ def get_content(link):
     tag_list = []
     for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
+        # a = 1
     for tag in website_code("time"):
         time_list.append(tag.get_text(strip=True))
         tag.decompose()
@@ -63,7 +70,8 @@ def get_content(link):
             continue
         class_list = tag.get('class', [])
         data = tag.get("data-testid")
-        important_words = ["metadata", "social-link", "social-share", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button"]
+        important_words = ["metadata", "social-link", "social-share", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button", "description", "infobox"]
+        # important_words = ["abcdefghijk"]
         decomposed = False
 
         if data or class_list:
