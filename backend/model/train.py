@@ -52,25 +52,40 @@ def get_content(link):
     footer_information = []
     recommended_list = []
     tag_list = []
+    menu_list = []
+    publish_list = []
+    external_list = []
+    source_list = []
+    distracting_words = ["click here", "learn more", "check out"]
+
     for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
         # a = 1
+    for tag in website_code("a"):
+        for word in distracting_words:
+            if word in tag.get_text(strip=True).lower():
+                tag.decompose()
     for tag in website_code("time"):
         time_list.append(tag.get_text(strip=True))
         tag.decompose()
     for tag in website_code("em"):
         emphasized_text_list.append(tag.get_text(strip=True))
+        for word in distracting_words:
+            if word in tag.get_text(strip=True).lower():
+                tag.decompose()
     for tag in website_code("li"):
         if not tag.find_all(["p", "span"]):
             tag.decompose()  
     for tag in website_code.find_all(True):
+        if tag.name == "html" or tag.name == "body":
+            continue
         if isinstance(tag, Tag) == False:
             continue
         if not tag.attrs:
             continue
         class_list = tag.get('class', [])
         data = tag.get("data-testid")
-        important_words = ["metadata", "social-link", "social-share", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button", "description", "infobox"]
+        important_words = ["metadata", "social-link", "social-share", "social-bookmark", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button", "description", "infobox", "menu", "publish", "boilerplate", "source"]
         # important_words = ["abcdefghijk"]
         decomposed = False
 
@@ -85,6 +100,13 @@ def get_content(link):
                                 break
                             else:
                                 recommended_list.append(tag.get_text(strip=True))
+                        if word == "menu":
+                            if tag.find(['p', 'span']):
+                                menu_list.append(tag.get_text(strip=True))
+                        if word == "publish":
+                            publish_list.append(tag.get_text(strip=True))
+                        if word == "source":
+                            source_list.append(tag.get_text(strip=True))
                         tag.decompose()
                         decomposed = True
                         break
@@ -99,6 +121,13 @@ def get_content(link):
                                     break
                                 else:
                                     recommended_list.append(tag.get_text(strip=True))
+                            if word == "menu":
+                                if tag.find(['p', 'span']):
+                                    menu_list.append(tag.get_text(strip=True))
+                            if word == "publish":
+                                publish_list.append(tag.get_text(strip=True))
+                            if word == "source":
+                                source_list.append(tag.get_text(strip=True))
                             tag.decompose()
                             decomposed = True
                             break
