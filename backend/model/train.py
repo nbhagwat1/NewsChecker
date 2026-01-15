@@ -75,7 +75,17 @@ def get_content(link):
                 tag.decompose()
     for tag in website_code("li"):
         if not tag.find_all(["p", "span"]):
-            tag.decompose()  
+            tag.decompose()
+    for tag in website_code("p"):
+        tag_children = []
+        for child in tag.contents:
+            if str(child).strip():
+                tag_children.append(child)
+
+        if len(tag_children) == 1:
+            only_child = tag_children[0]
+            if only_child.name == "a":
+                tag.decompose()  
     for tag in website_code.find_all(True):
         if tag.name == "html" or tag.name == "body":
             continue
