@@ -56,9 +56,9 @@ def get_content(link):
     publish_list = []
     external_list = []
     source_list = []
-    distracting_words = ["click here", "learn more", "check out"]
+    distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium"]
 
-    for tag in website_code(["script", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
+    for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
         # a = 1
     for tag in website_code("a"):
@@ -93,6 +93,15 @@ def get_content(link):
             continue
         if not tag.attrs:
             continue
+
+        style = tag.get("style", "")
+        if "visibility:hidden" in style:
+            tag.decompose()
+            continue
+        if tag.get("aria-hidden") == "true":
+            tag.decompose()
+            continue
+
         class_list = tag.get('class', [])
         data = tag.get("data-testid")
         important_words = ["metadata", "social-link", "social-share", "social-bookmark", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button", "description", "infobox", "menu", "publish", "boilerplate", "source"]
@@ -145,20 +154,33 @@ def get_content(link):
                         break
 
     paragraph_list = []
-    if (bool(website_code.find_all("article"))):
-        website_list = website_code.find_all("article")
-        for article in website_list:
-            for paragraph in article.find_all(["p", "ul", "ol"]):
-                paragraph_list.append(paragraph.get_text(" ", strip=True))
-    elif (bool(website_code.find_all("main"))):
-        website_list = website_code.find_all("main")
-        for main in website_list:
-            for paragraph in main.find_all(["p", "ul", "ol"]):
-                paragraph_list.append(paragraph.get_text(" ", strip=True))
+    if (bool(website_code.find("article"))):
+        article = website_code.find("article")
+        for paragraph in article.find_all(["p", "li"]):
+            if paragraph.name == "p":
+                if paragraph.find_parent("li") is None:
+                    paragraph_list.append(paragraph.get_text(" ", strip=True))
+            elif paragraph.name == "li":
+                if paragraph.find_parent("p") is None:
+                    paragraph_list.append(paragraph.get_text(" ", strip=True))
+    elif (bool(website_code.find("main"))):
+        main = website_code.find("main")
+        for paragraph in main.find_all(["p", "li"]):
+            if paragraph.name == "p":
+                if paragraph.find_parent("li") is None:
+                    paragraph_list.append(paragraph.get_text(" ", strip=True))
+            elif paragraph.name == "li":
+                if paragraph.find_parent("p") is None:
+                    paragraph_list.append(paragraph.get_text(" ", strip=True))
     else:
-        website_list = website_code.find_all(["p", "ul", "ol"])
+        website_list = website_code.find_all(["p", "li"])
         for paragraph in website_list:
-            paragraph_list.append(paragraph.get_text(" ", strip=True))
+            if paragraph.name == "p":
+                if paragraph.find_parent("li") is None:
+                    paragraph_list.append(paragraph.get_text(" ", strip=True))
+            elif paragraph.name == "li":
+                if paragraph.find_parent("p") is None:
+                    paragraph_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
     original_text = website_text
@@ -170,6 +192,9 @@ def get_content(link):
     if len(website_text) == 0:
         print("Text cleanup failed")
         exit(0)
+
+    # for art in website_code.find_all("article"):
+        # print(art.get_text(strip=True))
 
     return website_text, website_title, original_text, cleaned_text, time_list, footer_information, emphasized_text_list
 
