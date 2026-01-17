@@ -56,7 +56,7 @@ def get_content(link):
     publish_list = []
     external_list = []
     source_list = []
-    distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium"]
+    distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
 
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
@@ -68,24 +68,32 @@ def get_content(link):
     for tag in website_code("time"):
         time_list.append(tag.get_text(strip=True))
         tag.decompose()
-    for tag in website_code("em"):
+    for tag in website_code(["em", "i", "strong", "b", "u", "mark"]):
         emphasized_text_list.append(tag.get_text(strip=True))
         for word in distracting_words:
             if word in tag.get_text(strip=True).lower():
                 tag.decompose()
+                continue
+            
+            tag_text = tag.get_text(strip=True).lower()
+            if ("more" in tag_text or "related" in tag_text) and "news" in tag_text and ":" in tag_text:
+                tag.decompose()
     for tag in website_code("li"):
         if not tag.find_all(["p", "span"]):
             tag.decompose()
-    for tag in website_code("p"):
+    for tag in website_code(["p", "li"]):
         tag_children = []
         for child in tag.contents:
             if str(child).strip():
                 tag_children.append(child)
+        tag_children = [c for c in tag_children if c != ' HTML_TAG_START ' and c != ' HTML_TAG_END ']
 
         if len(tag_children) == 1:
             only_child = tag_children[0]
             if only_child.name == "a":
-                tag.decompose()  
+                tag.decompose()
+            elif isinstance(only_child, Tag) and (len(list(only_child.descendants)) >= 2 and list(only_child.descendants)[len(list(only_child.descendants)) - 2].name == "a"):
+                tag.decompose()
     for tag in website_code.find_all(True):
         if tag.name == "html" or tag.name == "body":
             continue
@@ -258,6 +266,9 @@ def create_embeddings(text):
     tone_model = SentenceTransformer("all-mpnet-base-v2")
     
     return text
+
+def check_leaf_tag(tag, tag_name):
+    return True
 
 def main():
     print("Hi")
