@@ -171,33 +171,33 @@ def get_content(link):
             if paragraph.name == "p":
                 if paragraph.find_parent("li") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
-                    structure_list.append(paragraph.get_text(strip=True))
+                    structure_list.append(paragraph.get_text(" ", strip=True))
             elif paragraph.name == "li":
                 if paragraph.find_parent("p") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
-                    structure_list.append(paragraph.get_text(strip=True))
+                    structure_list.append(paragraph.get_text(" ", strip=True))
     elif (bool(website_code.find("main"))):
         main = website_code.find("main")
         for paragraph in main.find_all(["p", "li"]):
             if paragraph.name == "p":
                 if paragraph.find_parent("li") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
-                    structure_list.append(paragraph.get_text(strip=True))
+                    structure_list.append(paragraph.get_text(" ", strip=True))
             elif paragraph.name == "li":
                 if paragraph.find_parent("p") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
-                    structure_list.append(paragraph.get_text(strip=True))
+                    structure_list.append(paragraph.get_text(" ", strip=True))
     else:
         website_list = website_code.find_all(["p", "li"])
         for paragraph in website_list:
             if paragraph.name == "p":
                 if paragraph.find_parent("li") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
-                    structure_list.append(paragraph.get_text(strip=True))
+                    structure_list.append(paragraph.get_text(" ", strip=True))
             elif paragraph.name == "li":
                 if paragraph.find_parent("p") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
-                    structure_list.append(paragraph.get_text(strip=True))
+                    structure_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
     original_text = website_text

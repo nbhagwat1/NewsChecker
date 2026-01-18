@@ -9,7 +9,7 @@ def main():
     i = 1
     for link in link_list:
         print("Link ", i)
-        a, b, c, d, e, f, g = get_content(link)
+        a, b, c, d, e, f, g, h = get_content(link)
         print(d)
         print("\n")
         i += 1
