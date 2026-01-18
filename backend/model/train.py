@@ -5,6 +5,8 @@ from sentence_transformers import SentenceTransformer
 import fasttext
 from huggingface_hub import hf_hub_download
 from transformers import pipeline
+import nltk
+from nltk.tokenize import sent_tokenize
 
 def examine_link(link):
     link = link.strip().lower()
@@ -56,6 +58,7 @@ def get_content(link):
     publish_list = []
     external_list = []
     source_list = []
+    structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
 
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
@@ -168,43 +171,53 @@ def get_content(link):
             if paragraph.name == "p":
                 if paragraph.find_parent("li") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
+                    structure_list.append(paragraph.get_text(strip=True))
             elif paragraph.name == "li":
                 if paragraph.find_parent("p") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
+                    structure_list.append(paragraph.get_text(strip=True))
     elif (bool(website_code.find("main"))):
         main = website_code.find("main")
         for paragraph in main.find_all(["p", "li"]):
             if paragraph.name == "p":
                 if paragraph.find_parent("li") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
+                    structure_list.append(paragraph.get_text(strip=True))
             elif paragraph.name == "li":
                 if paragraph.find_parent("p") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
+                    structure_list.append(paragraph.get_text(strip=True))
     else:
         website_list = website_code.find_all(["p", "li"])
         for paragraph in website_list:
             if paragraph.name == "p":
                 if paragraph.find_parent("li") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
+                    structure_list.append(paragraph.get_text(strip=True))
             elif paragraph.name == "li":
                 if paragraph.find_parent("p") is None:
                     paragraph_list.append(paragraph.get_text(" ", strip=True))
+                    structure_list.append(paragraph.get_text(strip=True))
     website_text = " ".join(paragraph_list)
 
     original_text = website_text
+    website_text = re.sub(r'\s+([.,!?;:])', r'\1', website_text) # removes any unnecessary spaces between punctuation and other words
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
     website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
     website_text = website_text.strip() # removes any whitespace from the text
     cleaned_text = website_text
 
+    for text in structure_list:
+        text = re.sub(r'\s+([.,!?;:])', r'\1', text) # removes any unnecessary spaces between punctuation and other words
+        text = re.sub(r'\s+', ' ', text) # replaces any sequence of 2+ spaces with a single space
+        text = re.sub(r'\n+', '\n', text) # replaces any sequence of 2+ newline characters with a single newline character
+        text = text.strip() # removes any whitespace from the text
+
     if len(website_text) == 0:
         print("Text cleanup failed")
         exit(0)
 
-    # for art in website_code.find_all("article"):
-        # print(art.get_text(strip=True))
-
-    return website_text, website_title, original_text, cleaned_text, time_list, footer_information, emphasized_text_list
+    return website_text, website_title, original_text, cleaned_text, structure_list, time_list, footer_information, emphasized_text_list
 
 def analyze_language(text):
     # Use FastText to determine the text's language
@@ -263,15 +276,13 @@ def create_embeddings(text):
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
 
-    tone_model = SentenceTransformer("all-mpnet-base-v2")
+    embedding_model = SentenceTransformer("all-mpnet-base-v2")
+    # nltk.download('punkt')
     
     return text
 
-def check_leaf_tag(tag, tag_name):
-    return True
-
 def main():
-    print("Hi")
+    create_embeddings("Hi")
 
 if __name__ == "__main__":
     main()

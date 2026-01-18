@@ -7,7 +7,7 @@ def main():
     currently_testing = ["https://www.yahoo.com/news/articles/east-tennessee-school-closures-delays-020404502.html"]
 
     i = 1
-    for link in link_list_three:
+    for link in link_list:
         print("Link ", i)
         a, b, c, d, e, f, g = get_content(link)
         print(d)
