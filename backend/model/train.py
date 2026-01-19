@@ -223,26 +223,19 @@ def analyze_language(text):
     # Use FastText to determine the text's language
     # Use HuggingFace / NLLB to translate the text
 
-    new_text = ""
-    for char in text:
-        if char != "\n":
-            new_text += char
-        else: 
-            new_text += " "
-
     language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
     detection_model = fasttext.load_model(language_model)
 
-    language_tuple = detection_model.predict(new_text)
+    language_tuple = detection_model.predict(text)
     language = language_tuple[0][0][9:12]
 
-    final_text = new_text
+    final_text = text
     if (language.lower() != "eng"):
         translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
-    
-        line_list = []
-        for line in text.split("\n"):
-            line_list.append(line)
+        nltk.download('punkt')
+        nltk.download('punkt_tab')
+
+        line_list = nltk.sent_tokenize(text)
         
         paragraph = ""
         total_words = 0
@@ -250,25 +243,19 @@ def analyze_language(text):
         for line in line_list:
             total_words += len(line.split())
             if total_words > 250:
-                paragraph_list.append(paragraph)
+                paragraph_list.append(paragraph.strip())
                 paragraph = line + " "
                 total_words = 0
             else:
                 paragraph += line + " "
-        paragraph_list.append(paragraph)
+        paragraph_list.append(paragraph.strip())
 
         translated_text = ""
         for paragraph in paragraph_list:
-            new_paragraph = ""
-            for char in paragraph:
-                if char != "\n":
-                    new_paragraph += char
-                else:
-                    new_paragraph += " "
-            translated_paragraph = translation_tool(new_paragraph, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
+            translated_paragraph = translation_tool(paragraph, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
             translated_text += translated_paragraph[0]['translation_text']
             translated_text += " "
-        final_text = translated_text
+        final_text = translated_text.strip()
     
     return final_text
 
