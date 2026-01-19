@@ -272,24 +272,42 @@ def analyze_language(text):
     
     return final_text
 
-def create_embeddings(text, paragraph_list):
+def create_embeddings(paragraph_list):
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
 
     embedding_model = SentenceTransformer("all-mpnet-base-v2")
-    # nltk.download('punkt')
+    nltk.download('punkt')
+    nltk.download('punkt_tab')
 
     initial_list = []
-    count_list = []
+    # count_list = []
     for paragraph in paragraph_list:
         word_count = len(paragraph.split())
-        count_list.append(word_count)
+        # count_list.append(word_count)
         if word_count < 300:
             initial_list.append(paragraph)
         else:
-            print("idk")
+            sentences = nltk.sent_tokenize(paragraph)
+            new_paragraph = ""
+            paragraph_words = 0
+            for i, sentence in enumerate(sentences):
+                paragraph_words += len(sentence.split())
+                if (paragraph_words < 300):
+                    new_paragraph += (sentence + " ")
+                    if i == len(sentences) - 1:
+                        initial_list.append(new_paragraph.strip())
+                else:
+                    initial_list.append(new_paragraph.strip())
+                    if i < len(sentences) - 1:
+                        new_paragraph = sentence + " "
+                        paragraph_words = len(sentence.split())
+                    else:
+                        initial_list.append(sentence.strip())
+
+    print(initial_list)
             
-    return count_list
+    # return count_list
 
 def main():
     create_embeddings("Hi")
