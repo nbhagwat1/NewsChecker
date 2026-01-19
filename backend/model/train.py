@@ -263,15 +263,13 @@ def create_embeddings(paragraph_list):
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
 
-    embedding_model = SentenceTransformer("all-mpnet-base-v2")
+    embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
     nltk.download('punkt')
     nltk.download('punkt_tab')
 
     initial_list = []
-    # count_list = []
     for paragraph in paragraph_list:
         word_count = len(paragraph.split())
-        # count_list.append(word_count)
         if word_count < 300:
             initial_list.append(paragraph)
         else:
@@ -291,10 +289,9 @@ def create_embeddings(paragraph_list):
                         paragraph_words = len(sentence.split())
                     else:
                         initial_list.append(sentence.strip())
-
-    print(initial_list)
-            
-    # return count_list
+    
+    embeddings = embedding_model.encode(initial_list)
+    return embeddings
 
 def main():
     create_embeddings("Hi")
