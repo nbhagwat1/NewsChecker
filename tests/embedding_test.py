@@ -1,4 +1,4 @@
-from backend.model.train import get_content, create_embeddings, analyze_language
+from backend.model.text_extraction import get_content, create_embeddings, analyze_language
 
 def test_sentence_formation(list):
     '''
