@@ -311,9 +311,3 @@ def create_embeddings(paragraph_list):
     suspicious_factors["low_variance"] = np.var(embeddings, axis=0).mean() <= 0.001
 
     return embeddings, suspicious_factors
-
-def main():
-    create_embeddings("Hi")
-
-if __name__ == "__main__":
-    main()
