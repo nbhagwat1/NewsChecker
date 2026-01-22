@@ -7,6 +7,7 @@ from huggingface_hub import hf_hub_download
 from transformers import pipeline
 import nltk
 from nltk.tokenize import sent_tokenize
+import numpy as np
 
 def examine_link(link):
     link = link.strip().lower()
@@ -291,7 +292,25 @@ def create_embeddings(paragraph_list):
                         initial_list.append(sentence.strip())
     
     embeddings = embedding_model.encode(initial_list)
-    return embeddings
+
+    total_word_count = 0
+    for segment in initial_list:
+        total_word_count += len(segment.split())
+    average_word_count = total_word_count / len(initial_list)
+
+    suspicious_factors = {
+        "too_short": False,
+        "all_zero": False,
+        "extreme_segment_length": False,
+        "low_variance": False
+    }
+
+    suspicious_factors["too_short"] = embeddings.shape[0] < 3
+    suspicious_factors["all_zero"] = np.all(embeddings == 0)
+    suspicious_factors["extreme_segment_length"] = not (30 <= average_word_count <= 200)
+    suspicious_factors["low_variance"] = np.var(embeddings, axis=0).mean() <= 0.001
+
+    return embeddings, suspicious_factors
 
 def main():
     create_embeddings("Hi")
