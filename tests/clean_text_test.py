@@ -1,4 +1,4 @@
-from backend.model.text_extraction import get_content
+from backend.preprocessing.text_extraction import get_content, create_embeddings
 
 def main():
     link_list = ["https://www.cnn.com/2026/01/05/politics/jd-vance-ohio-residence", "https://www.bbc.com/news/articles/cdre0008l4ko", "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway", "https://www.nbcnews.com/world/venezuela/delcy-rodriguez-venezuelas-interim-leader-capture-nicolas-maduro-rcna252322", "https://www.cbsnews.com/minnesota/news/tim-walz-drop-out-of-gubernatorial-race-2026/", "https://abcnews.go.com/Health/new-federal-screening-guidance-expands-cervical-cancer-testing/story?id=128891185", "https://www.socialmediatoday.com/news/instagram-chief-says-longer-captions-dont-impact-post-reach/758462/?utm_source=chatgpt.com"]
@@ -6,13 +6,19 @@ def main():
     link_list_three = ["https://news.yahoo.com/articles/two-brewing-snow-storms-puzzle-173201877.html", "https://www.yahoo.com/news/articles/east-tennessee-school-closures-delays-020404502.html", "https://www.yahoo.com/finance/news/mcdonalds-bets-ai-2026-fix-193300993.html", "https://www.yahoo.com/news/articles/snow-florida-arctic-blast-stun-164720507.html", "https://www.yahoo.com/news/articles/she-terrified-details-emerge-ohio-010134244.html"]
     currently_testing = ["https://www.yahoo.com/news/articles/east-tennessee-school-closures-delays-020404502.html"]
 
+    full_list = link_list + link_list_two + link_list_three
+
     i = 1
-    for link in link_list:
+    for link in full_list:
         print("Link ", i)
         a, b, c, d, e, f, g, h = get_content(link)
-        print(d)
-        print("\n")
+        j, k = create_embeddings(e)
+        false_count = 0
+        if k['low_variance'] == False:
+            false_count += 1
         i += 1
+    
+    print(false_count)
 
 if __name__ == "__main__":
     main()

@@ -305,6 +305,8 @@ def create_embeddings(paragraph_list):
         "low_variance": False
     }
 
+    # print(np.var(embeddings, axis=0).mean())
+
     suspicious_factors["too_short"] = embeddings.shape[0] < 3
     suspicious_factors["all_zero"] = np.all(embeddings == 0)
     suspicious_factors["extreme_segment_length"] = not (30 <= average_word_count <= 200)

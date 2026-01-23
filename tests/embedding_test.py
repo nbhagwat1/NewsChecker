@@ -1,4 +1,4 @@
-from backend.model.text_extraction import get_content, create_embeddings, analyze_language
+from backend.preprocessing.text_extraction import get_content, create_embeddings, analyze_language
 
 def test_sentence_formation(list):
     '''
@@ -27,11 +27,12 @@ def test_translation_separation(text):
     analyze_language(text)
 
 def get_embeddings(list):
-    embeddings = create_embeddings(list)
-    print(embeddings)
+    embeddings, b = create_embeddings(list)
+    print(b)
+    # print(embeddings)
 
 def main():
-    article_link = "https://www.cnn.com/2026/01/05/politics/jd-vance-ohio-residence"
+    article_link = "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway"
     a, b, c, text, list, f, g, h = get_content(article_link)
 
     # test_sentence_formation(list)
