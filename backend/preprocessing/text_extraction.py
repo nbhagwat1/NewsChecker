@@ -30,7 +30,19 @@ def get_content(link):
 
     response = requests.get(link, headers=headers, timeout=10)
     if (response.status_code != 200):
-        return None
+        code = response.status_code
+        reason = ""
+
+        if code == 403:
+            reason = "Website does not provide permission to get HTML"
+        elif code == 404:
+            reason = "URL is not recognized"
+        elif code == 401:
+            reason = "Client must authenticate itself to get HTML"
+        else:
+            reason = "Complicated"
+        
+        return None, None, None, None, reason
     
     website_content = response.text
     # print(website_content)
@@ -199,7 +211,6 @@ def get_content(link):
                     structure_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
-    original_text = website_text
     website_text = re.sub(r'\s+([.,!?;:])', r'\1', website_text) # removes any unnecessary spaces between punctuation and other words
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
     website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
@@ -213,7 +224,7 @@ def get_content(link):
         text = text.strip() # removes any whitespace from the text
 
     if len(website_text) == 0:
-        return None
+        return None, None, None, None, "Text cleanup function got rid of everything"
 
     additional_information = {
         "time_list": time_list,
@@ -224,47 +235,60 @@ def get_content(link):
         "publish_list": publish_list,
         "source_list": source_list
     }
-    return website_title, original_text, cleaned_text, structure_list, additional_information
+    
+    return cleaned_text, website_title, structure_list, additional_information, None
 
-def analyze_language(text):
+def analyze_language(segment_list):
     # Use FastText to determine the text's language
     # Use HuggingFace / NLLB to translate the text
 
     language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
     detection_model = fasttext.load_model(language_model)
 
-    language_tuple = detection_model.predict(text)
-    language = language_tuple[0][0][9:12]
+    nltk.download('punkt')
+    nltk.download('punkt_tab')
 
-    final_text = text
-    if (language.lower() != "eng"):
-        translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
-        nltk.download('punkt')
-        nltk.download('punkt_tab')
+    initial_list = []
+    for paragraph in segment_list:
+        word_count = len(paragraph.split())
+        if word_count < 300:
+            initial_list.append(paragraph)
+        else:
+            sentences = nltk.sent_tokenize(paragraph)
+            new_paragraph = ""
+            paragraph_words = 0
+            for i, sentence in enumerate(sentences):
+                paragraph_words += len(sentence.split())
+                if (paragraph_words < 300):
+                    new_paragraph += (sentence + " ")
+                    if i == len(sentences) - 1:
+                        initial_list.append(new_paragraph.strip())
+                else:
+                    initial_list.append(new_paragraph.strip())
+                    if i < len(sentences) - 1:
+                        new_paragraph = sentence + " "
+                        paragraph_words = len(sentence.split())
+                    else:
+                        initial_list.append(sentence.strip())
 
-        line_list = nltk.sent_tokenize(text)
-        
-        paragraph = ""
-        total_words = 0
-        paragraph_list = []
-        for line in line_list:
-            total_words += len(line.split())
-            if total_words > 250:
-                paragraph_list.append(paragraph.strip())
-                paragraph = line + " "
-                total_words = 0
-            else:
-                paragraph += line + " "
-        paragraph_list.append(paragraph.strip())
+    final_list = []
 
-        translated_text = ""
-        for paragraph in paragraph_list:
-            translated_paragraph = translation_tool(paragraph, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
+    for segment in initial_list:
+        language_tuple = detection_model.predict(segment)
+        language = language_tuple[0][0][9:12]
+
+        final_text = segment
+        if (language.lower() != "eng"):
+            translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
+
+            translated_text = ""
+            translated_paragraph = translation_tool(segment, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
             translated_text += translated_paragraph[0]['translation_text']
-            translated_text += " "
-        final_text = translated_text.strip()
+            final_text = translated_text.strip()
+        
+        final_list.append(final_text)
     
-    return final_text
+    return final_list
 
 def create_embeddings(paragraph_list):
     # model: SentenceTransformers - all-mpnet-base-v2

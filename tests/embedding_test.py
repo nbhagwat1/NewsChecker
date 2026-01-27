@@ -24,7 +24,8 @@ def test_word_count():
     create_embeddings(sample_list)
 
 def test_translation_separation(text):
-    analyze_language(text)
+    final_text = analyze_language(text)
+    return final_text
 
 def get_embeddings(list):
     embeddings, b = create_embeddings(list)
@@ -33,12 +34,20 @@ def get_embeddings(list):
 
 def main():
     article_link = "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway"
-    a, b, c, text, list, f, g, h = get_content(article_link)
+    text, list, f, g, h = get_content(article_link)
 
     # test_sentence_formation(list)
     # test_word_count()
-    # test_translation_separation(text)
-    get_embeddings(list)
+    '''
+    j = test_translation_separation(f)
+    print(text)
+    print("\n")
+    for i, sentence in enumerate(j):
+        print(f"Index {i + 1}: {sentence}")
+    # get_embeddings(list)
+    '''
+
+    print(test_translation_separation(["Hola. Me llamo Nikhil"]))
 
 if __name__ == "__main__":
     main()

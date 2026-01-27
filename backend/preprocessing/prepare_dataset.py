@@ -8,6 +8,16 @@ def main():
     article_links = news_data['news_url'].tolist()
     article_labels = news_data['real'].tolist()
 
-    embeddings = []
+    final_data = []
+    failed_data = []
+
     for link in article_links:
-        content = get_content(link)
+        content, title, list, additional_information, reason = get_content(link)
+        if content is None:
+            failed_data.append({
+                "link": link,
+                "reason": reason
+            })
+        else:
+            translated_content = analyze_language(content)
+            embeddings = create_embeddings
