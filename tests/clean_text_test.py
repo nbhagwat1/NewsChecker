@@ -1,4 +1,4 @@
-from backend.preprocessing.text_extraction import get_content, create_embeddings
+from backend.preprocessing.text_extraction import get_content, create_embeddings, examine_link
 
 def main():
     link_list = ["https://www.cnn.com/2026/01/05/politics/jd-vance-ohio-residence", "https://www.bbc.com/news/articles/cdre0008l4ko", "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway", "https://www.nbcnews.com/world/venezuela/delcy-rodriguez-venezuelas-interim-leader-capture-nicolas-maduro-rcna252322", "https://www.cbsnews.com/minnesota/news/tim-walz-drop-out-of-gubernatorial-race-2026/", "https://abcnews.go.com/Health/new-federal-screening-guidance-expands-cervical-cancer-testing/story?id=128891185", "https://www.socialmediatoday.com/news/instagram-chief-says-longer-captions-dont-impact-post-reach/758462/?utm_source=chatgpt.com"]
@@ -9,6 +9,7 @@ def main():
     full_list = link_list + link_list_two + link_list_three
 
     i = 1
+    '''
     for link in full_list:
         print("Link ", i)
         a, b, c, d, e, f, g, h = get_content(link)
@@ -19,6 +20,12 @@ def main():
         i += 1
     
     print(false_count)
+    '''
+
+    for link in full_list:
+        examine_link(link)
+        print(f"Link {i}: Successful")
+        i += 1
 
 if __name__ == "__main__":
     main()

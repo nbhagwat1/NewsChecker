@@ -30,9 +30,7 @@ def get_content(link):
 
     response = requests.get(link, headers=headers, timeout=10)
     if (response.status_code != 200):
-        print(response.status_code)
-        print("HTTP request failed")
-        exit(0)
+        return None
     
     website_content = response.text
     # print(website_content)
@@ -49,15 +47,15 @@ def get_content(link):
             website_title = ""
 
     website_text = ""
-    text_list = []
+    # text_list = []
     time_list = []
     emphasized_text_list = []
     footer_information = []
     recommended_list = []
-    tag_list = []
+    # tag_list = []
     menu_list = []
     publish_list = []
-    external_list = []
+    # external_list = []
     source_list = []
     structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
@@ -215,10 +213,18 @@ def get_content(link):
         text = text.strip() # removes any whitespace from the text
 
     if len(website_text) == 0:
-        print("Text cleanup failed")
-        exit(0)
+        return None
 
-    return website_text, website_title, original_text, cleaned_text, structure_list, time_list, footer_information, emphasized_text_list
+    additional_information = {
+        "time_list": time_list,
+        "emphasized_text_list": emphasized_text_list,
+        "footer_information": footer_information,
+        "recommended_list": recommended_list,
+        "menu_list": menu_list,
+        "publish_list": publish_list,
+        "source_list": source_list
+    }
+    return website_title, original_text, cleaned_text, structure_list, additional_information
 
 def analyze_language(text):
     # Use FastText to determine the text's language
