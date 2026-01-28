@@ -8,6 +8,8 @@ from transformers import pipeline
 import nltk
 from nltk.tokenize import sent_tokenize
 import numpy as np
+import math
+import time
 
 def examine_link(link):
     link = link.strip().lower()
@@ -24,25 +26,47 @@ def examine_link(link):
         exit(0)
 
 def get_content(link):
+    if (link is None) or (isinstance(link, float) and math.isnan(link)):
+        return None, None, None, None, "Link is missing"
+
+    if not link.startswith("http://") and not link.startswith("https://"):
+        link = "https://" + link
+
     headers = {
         "User-Agent": "NewsChecker/1.0 (learning project)"
     }
 
-    response = requests.get(link, headers=headers, timeout=10)
+    response = None
+
+    for attempt in range(3):
+        try:    
+            response = requests.get(link, headers=headers, timeout=20)
+            response.raise_for_status()
+            break
+        except requests.exceptions.ReadTimeout:
+            time.sleep(2)
+        except requests.exceptions.RequestException as e:
+            code = 0
+            if e.response:
+                code = e.response.status_code
+            reason = f"Error code {code}: "
+
+            if code == 403:
+                reason += "Website does not provide permission to get HTML"
+            elif code == 404:
+                reason += "URL is not recognized"
+            elif code == 401:
+                reason += "Client must authenticate itself to get HTML"
+            else:
+                reason += "Complicated"
+            
+            return None, None, None, None, reason
+
+    if response is None:
+        return None, None, None, None, "Program could not get the HTML of the article link fast enough"
     if (response.status_code != 200):
         code = response.status_code
-        reason = ""
-
-        if code == 403:
-            reason = "Website does not provide permission to get HTML"
-        elif code == 404:
-            reason = "URL is not recognized"
-        elif code == 401:
-            reason = "Client must authenticate itself to get HTML"
-        else:
-            reason = "Complicated"
-        
-        return None, None, None, None, reason
+        return None, None, None, None, f"Error code {code}: Complicated (Not a 4xx or 5xx error)"
     
     website_content = response.text
     # print(website_content)
@@ -245,8 +269,12 @@ def analyze_language(segment_list):
     language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
     detection_model = fasttext.load_model(language_model)
 
-    nltk.download('punkt')
-    nltk.download('punkt_tab')
+    for tokenizer in ["punkt", "punkt_tab"]:
+        try:
+            nltk.data.find(f"tokenizers/{tokenizer}")
+        except LookupError:
+            nltk.download('punkt')
+            nltk.download('punkt_tab')
 
     initial_list = []
     for paragraph in segment_list:
@@ -271,10 +299,12 @@ def analyze_language(segment_list):
                     else:
                         initial_list.append(sentence.strip())
 
+    initial_list_copy = initial_list[:]
     final_list = []
 
-    for segment in initial_list:
-        language_tuple = detection_model.predict(segment)
+    for segment, segment_copy in zip(initial_list, initial_list_copy):
+        clean_segment = segment_copy.replace("\n", " ")
+        language_tuple = detection_model.predict(clean_segment)
         language = language_tuple[0][0][9:12]
 
         final_text = segment
@@ -295,8 +325,13 @@ def create_embeddings(paragraph_list):
     # Use SentenceTransformers to convert text into an embedding
 
     embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
-    nltk.download('punkt')
-    nltk.download('punkt_tab')
+    
+    for tokenizer in ["punkt", "punkt_tab"]:
+        try:
+            nltk.data.find(f"tokenizers/{tokenizer}")
+        except LookupError:
+            nltk.download('punkt')
+            nltk.download('punkt_tab')
 
     initial_list = []
     for paragraph in paragraph_list:

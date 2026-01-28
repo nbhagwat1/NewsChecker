@@ -21,7 +21,16 @@ def test_word_count():
     '''
 
     sample_list = ["I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava.", "SMG4 was an amazing YouTuber. Every day, he would make me laugh. His departure is something that no one would have ever expected. He will be missed."]
-    create_embeddings(sample_list)
+    x = test_translation_separation(sample_list)
+    print(f"Sample list: {sample_list}\n")
+    for i, j in enumerate(x):
+        print(f"Index {i}: {j}")
+    print("\n")
+    y, z = create_embeddings(sample_list)
+    print("Embeddings:")
+    print(y)
+    print("\n")
+    print(f"Dictionary: {z}\n")
 
 def test_translation_separation(text):
     final_text = analyze_language(text)
@@ -37,7 +46,7 @@ def main():
     text, list, f, g, h = get_content(article_link)
 
     # test_sentence_formation(list)
-    # test_word_count()
+    test_word_count()
     '''
     j = test_translation_separation(f)
     print(text)
@@ -47,7 +56,7 @@ def main():
     # get_embeddings(list)
     '''
 
-    print(test_translation_separation(["Hola. Me llamo Nikhil"]))
+    # print(test_translation_separation(["Hola. Me llamo Nikhil"]))
 
 if __name__ == "__main__":
     main()

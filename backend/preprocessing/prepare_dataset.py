@@ -11,7 +11,7 @@ def main():
     final_data = []
     failed_data = []
 
-    for link in article_links:
+    for link, label in zip(article_links, article_labels):
         content, title, list, additional_information, reason = get_content(link)
         if content is None:
             failed_data.append({
@@ -19,5 +19,18 @@ def main():
                 "reason": reason
             })
         else:
-            translated_content = analyze_language(content)
-            embeddings = create_embeddings
+            translated_content = analyze_language(list)
+            embeddings, flags = create_embeddings(translated_content)
+            final_data.append({
+                "link": link,
+                "label": label,
+                "article_text": title + "\n\n" + " ".join(translated_content),
+                "embeddings": embeddings,
+                "flags": flags
+            })
+    
+    print(f"Length of valid articles: {len(final_data)}")
+    print(f"Length of invalid articles: {len(failed_data)}")
+    
+if __name__ == "__main__":
+    main()
