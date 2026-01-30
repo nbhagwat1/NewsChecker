@@ -312,7 +312,7 @@ def analyze_language(segment_list):
             translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
 
             translated_text = ""
-            translated_paragraph = translation_tool(segment, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
+            translated_paragraph = translation_tool(segment, max_length=512, truncation=True, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
             translated_text += translated_paragraph[0]['translation_text']
             final_text = translated_text.strip()
         

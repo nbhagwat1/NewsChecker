@@ -5,12 +5,16 @@ from backend.preprocessing.text_extraction import get_content, analyze_language,
 def main():
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
 
-    article_links = news_data['news_url'].tolist()
-    article_labels = news_data['real'].tolist()
+    news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
+    test_data = news_data.iloc[200:400]
+
+    article_links = test_data['news_url'].tolist()
+    article_labels = test_data['real'].tolist()
 
     final_data = []
     failed_data = []
 
+    i = 1
     for link, label in zip(article_links, article_labels):
         content, title, list, additional_information, reason = get_content(link)
         if content is None:
@@ -28,9 +32,20 @@ def main():
                 "embeddings": embeddings,
                 "flags": flags
             })
-    
+        print(f"Article {i} complete")
+        i += 1
+
     print(f"Length of valid articles: {len(final_data)}")
     print(f"Length of invalid articles: {len(failed_data)}")
+
+    fake_article_count = 0
+    for valid_article in final_data:
+        if valid_article['label'] == 0:
+            fake_article_count += 1
+    
+    print("\n")
+    print(f"Fake articles: {fake_article_count}")
+    print(f"Real articles: {len(final_data) - fake_article_count}")
     
 if __name__ == "__main__":
     main()
