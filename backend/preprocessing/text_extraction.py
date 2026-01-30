@@ -68,6 +68,8 @@ def get_content(link):
         code = response.status_code
         return None, None, None, None, f"Error code {code}: Complicated (Not a 4xx or 5xx error)"
     
+    print("Got HTML")
+
     website_content = response.text
     # print(website_content)
     website_code = BeautifulSoup(website_content, 'html.parser')
@@ -82,6 +84,8 @@ def get_content(link):
         else:
             website_title = ""
 
+    print("Got title")
+
     website_text = ""
     # text_list = []
     time_list = []
@@ -95,6 +99,8 @@ def get_content(link):
     source_list = []
     structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
+
+    print("Created lists")
 
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
@@ -198,6 +204,8 @@ def get_content(link):
                             break
                     if decomposed:
                         break
+
+    print("Decomposed unimportant tags")
 
     paragraph_list = []
     if (bool(website_code.find("article"))):
