@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup, Tag
 from sentence_transformers import SentenceTransformer
 import fasttext
 from huggingface_hub import hf_hub_download
+from huggingface_hub.utils import HfHubHTTPError
 from transformers import pipeline
 import nltk
 from nltk.tokenize import sent_tokenize
@@ -68,7 +69,7 @@ def get_content(link):
         code = response.status_code
         return None, None, None, None, f"Error code {code}: Complicated (Not a 4xx or 5xx error)"
     
-    print("Got HTML")
+    # print("Got HTML")
 
     website_content = response.text
     # print(website_content)
@@ -84,7 +85,7 @@ def get_content(link):
         else:
             website_title = ""
 
-    print("Got title")
+    # print("Got title")
 
     website_text = ""
     # text_list = []
@@ -100,7 +101,7 @@ def get_content(link):
     structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
 
-    print("Created lists")
+    # print("Created lists")
 
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
@@ -205,7 +206,7 @@ def get_content(link):
                     if decomposed:
                         break
 
-    print("Decomposed unimportant tags")
+    # print("Decomposed unimportant tags")
 
     paragraph_list = []
     if (bool(website_code.find("article"))):
@@ -243,6 +244,8 @@ def get_content(link):
                     structure_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
+    # print("Extracted important text from HTML")
+
     website_text = re.sub(r'\s+([.,!?;:])', r'\1', website_text) # removes any unnecessary spaces between punctuation and other words
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
     website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
@@ -268,6 +271,8 @@ def get_content(link):
         "source_list": source_list
     }
     
+    # print("Reached the end of the method")
+
     return cleaned_text, website_title, structure_list, additional_information, None
 
 def analyze_language(segment_list):
@@ -317,7 +322,19 @@ def analyze_language(segment_list):
 
         final_text = segment
         if (language.lower() != "eng"):
-            translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
+            translation_tool = None
+
+            for i in range(3):
+                try:
+                    translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
+                except HfHubHTTPError as e:
+                    time.sleep(2)
+                except Exception as e:
+                    code = 0
+                    if e.response:
+                        code = e.response.status_code
+                    
+                    return None, f"Erroneous translation of text (Error code: {code})"
 
             translated_text = ""
             translated_paragraph = translation_tool(segment, max_length=512, truncation=True, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
@@ -326,7 +343,7 @@ def analyze_language(segment_list):
         
         final_list.append(final_text)
     
-    return final_list
+    return final_list, None
 
 def create_embeddings(paragraph_list):
     # model: SentenceTransformers - all-mpnet-base-v2
@@ -340,6 +357,8 @@ def create_embeddings(paragraph_list):
         except LookupError:
             nltk.download('punkt')
             nltk.download('punkt_tab')
+
+    # print("Starting process")
 
     initial_list = []
     for paragraph in paragraph_list:
@@ -364,7 +383,17 @@ def create_embeddings(paragraph_list):
                     else:
                         initial_list.append(sentence.strip())
     
+    # print("Created list of segments")
+    # print(f"Length: {len(initial_list)}")
+
+    '''
+    for i, segment in enumerate(initial_list):
+        print(f"Index {i + 1}: {segment}")
+    '''
+    
     embeddings = embedding_model.encode(initial_list)
+
+    # print("Created embeddings")
 
     total_word_count = 0
     for segment in initial_list:

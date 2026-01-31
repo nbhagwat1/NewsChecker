@@ -6,7 +6,7 @@ def main():
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
-    test_data = news_data.iloc[600:800]
+    test_data = news_data.iloc[500:600]
 
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
@@ -23,8 +23,20 @@ def main():
                 "reason": reason
             })
         else:
-            translated_content = analyze_language(list)
+            translated_content, failed_reason = analyze_language(list)
+            if translated_content is None:
+                failed_data.append({
+                    "link": link,
+                    "reason": failed_reason
+                })
+                continue
+
+            # print("Method returned something")
+
             embeddings, flags = create_embeddings(translated_content)
+
+            # print("Another method returned something")
+
             final_data.append({
                 "link": link,
                 "label": label,
