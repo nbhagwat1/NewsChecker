@@ -390,6 +390,17 @@ def create_embeddings(paragraph_list):
     for i, segment in enumerate(initial_list):
         print(f"Index {i + 1}: {segment}")
     '''
+
+    segment_count = len(initial_list)
+    if segment_count > 2000:
+        sampled_segments = []
+        stride = segment_count / 2000
+
+        for i in range(2000):
+            index = int(stride * i)
+            sampled_segments.append(initial_list[index])
+        
+        initial_list = sampled_segments
     
     embeddings = embedding_model.encode(initial_list)
 

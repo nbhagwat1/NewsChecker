@@ -6,7 +6,7 @@ def main():
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
-    test_data = news_data.iloc[500:600]
+    test_data = news_data.iloc[600:1100]
 
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
