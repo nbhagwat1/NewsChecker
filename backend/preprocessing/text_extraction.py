@@ -336,6 +336,9 @@ def analyze_language(segment_list):
                     
                     return None, f"Erroneous translation of text (Error code: {code})"
 
+            if translation_tool is None:
+                return None, "Failed to initialize translation tool"
+
             translated_text = ""
             translated_paragraph = translation_tool(segment, max_length=512, truncation=True, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
             translated_text += translated_paragraph[0]['translation_text']

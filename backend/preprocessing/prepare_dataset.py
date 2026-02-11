@@ -8,7 +8,7 @@ def main():
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
-    test_data = news_data.iloc[600:1100]
+    test_data = news_data.iloc[1500:1600]
 
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
@@ -66,7 +66,8 @@ def main():
 
     contains_fake_article = False
     while contains_fake_article == False:
-        new_final_data = random.shuffle(final_data)
+        new_final_data = final_data
+        random.shuffle(new_final_data)
 
         training_count = int(0.7 * len(new_final_data))
         validating_count = int(0.15 * len(new_final_data))
