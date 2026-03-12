@@ -11,6 +11,7 @@ from nltk.tokenize import sent_tokenize
 import numpy as np
 import math
 import time
+import gc
 
 def examine_link(link):
     link = link.strip().lower()
@@ -69,7 +70,7 @@ def get_content(link):
         code = response.status_code
         return None, None, None, None, f"Error code {code}: Complicated (Not a 4xx or 5xx error)"
     
-    # print("Got HTML")
+    print("Got HTML")
 
     website_content = response.text
     # print(website_content)
@@ -85,7 +86,7 @@ def get_content(link):
         else:
             website_title = ""
 
-    # print("Got title")
+    print("Got title")
 
     website_text = ""
     # text_list = []
@@ -101,7 +102,7 @@ def get_content(link):
     structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
 
-    # print("Created lists")
+    print("Created lists")
 
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
@@ -206,7 +207,7 @@ def get_content(link):
                     if decomposed:
                         break
 
-    # print("Decomposed unimportant tags")
+    print("Decomposed unimportant tags")
 
     paragraph_list = []
     if (bool(website_code.find("article"))):
@@ -244,7 +245,7 @@ def get_content(link):
                     structure_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
-    # print("Extracted important text from HTML")
+    print("Extracted important text from HTML")
 
     website_text = re.sub(r'\s+([.,!?;:])', r'\1', website_text) # removes any unnecessary spaces between punctuation and other words
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
@@ -271,16 +272,15 @@ def get_content(link):
         "source_list": source_list
     }
     
-    # print("Reached the end of the method")
+    print("Reached the end of the method")
 
     return cleaned_text, website_title, structure_list, additional_information, None
 
-def analyze_language(segment_list):
+def analyze_language(segment_list, detection_model):
     # Use FastText to determine the text's language
     # Use HuggingFace / NLLB to translate the text
 
-    language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
-    detection_model = fasttext.load_model(language_model)
+    print("Created tools")
 
     for tokenizer in ["punkt", "punkt_tab"]:
         try:
@@ -288,6 +288,8 @@ def analyze_language(segment_list):
         except LookupError:
             nltk.download('punkt')
             nltk.download('punkt_tab')
+
+    print("Start of creating list")
 
     initial_list = []
     for paragraph in segment_list:
@@ -315,6 +317,12 @@ def analyze_language(segment_list):
     initial_list_copy = initial_list[:]
     final_list = []
 
+    print("Finished creation of list")
+
+    print("Start translation")
+
+    print(len(initial_list))
+
     for segment, segment_copy in zip(initial_list, initial_list_copy):
         clean_segment = segment_copy.replace("\n", " ")
         language_tuple = detection_model.predict(clean_segment)
@@ -322,6 +330,7 @@ def analyze_language(segment_list):
 
         final_text = segment
         if (language.lower() != "eng"):
+            print("Text is not English")
             translation_tool = None
 
             for i in range(3):
@@ -346,13 +355,16 @@ def analyze_language(segment_list):
         
         final_list.append(final_text)
     
+    print("Finished translation")
+
     return final_list, None
 
-def create_embeddings(paragraph_list):
+def create_embeddings(paragraph_list, embedding_model):
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
 
-    embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+    
+    # print(embedding_model.device)
     
     for tokenizer in ["punkt", "punkt_tab"]:
         try:
@@ -361,7 +373,7 @@ def create_embeddings(paragraph_list):
             nltk.download('punkt')
             nltk.download('punkt_tab')
 
-    # print("Starting process")
+    print("Starting process")
 
     initial_list = []
     for paragraph in paragraph_list:
@@ -386,8 +398,8 @@ def create_embeddings(paragraph_list):
                     else:
                         initial_list.append(sentence.strip())
     
-    # print("Created list of segments")
-    # print(f"Length: {len(initial_list)}")
+    print("Created list of segments")
+    print(f"Length: {len(initial_list)}")
 
     '''
     for i, segment in enumerate(initial_list):
@@ -405,10 +417,18 @@ def create_embeddings(paragraph_list):
         
         initial_list = sampled_segments
     
-    embeddings = embedding_model.encode(initial_list)
+    embeddings = embedding_model.encode(initial_list, batch_size=64, show_progress_bar=False)
+    average_embedding = np.mean(embeddings, axis=0)
 
-    # print("Created embeddings")
+    print("Created embeddings")
 
+    del embeddings
+    del initial_list
+    gc.collect()
+
+    suspicious_factors = {}
+
+    '''
     total_word_count = 0
     for segment in initial_list:
         total_word_count += len(segment.split())
@@ -427,5 +447,6 @@ def create_embeddings(paragraph_list):
     suspicious_factors["all_zero"] = np.all(embeddings == 0)
     suspicious_factors["extreme_segment_length"] = not (30 <= average_word_count <= 200)
     suspicious_factors["low_variance"] = np.var(embeddings, axis=0).mean() <= 0.001
+    '''
 
-    return embeddings, suspicious_factors
+    return average_embedding, suspicious_factors

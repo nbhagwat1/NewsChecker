@@ -19,11 +19,11 @@ def unpack_dataset(dataset):
     y_list = []
 
     for sample in dataset:
-        segments = sample["embeddings"]
-        average_embedding = np.mean(segments, axis=0)
+        average_embedding = sample[0]
+        label = sample[1]
 
         X_list.append(average_embedding)
-        y_list.append(sample["label"])
+        y_list.append(label)
     
     X_dataset = np.stack(X_list)
     y_dataset = np.array(y_list)
@@ -37,7 +37,10 @@ def main():
     X_validate_dataset, y_validate_dataset = unpack_dataset(validate_dataset)
     X_test_dataset, y_test_dataset = unpack_dataset(test_dataset)
 
-    '''
+    X_train_dataset = X_train_dataset.astype(np.float32)
+    X_validate_dataset = X_validate_dataset.astype(np.float32)
+    X_test_dataset = X_test_dataset.astype(np.float32)
+
     print("X_train:", X_train_dataset.shape, "y_train:", y_train_dataset.shape)
     print("X_val:", X_validate_dataset.shape, "y_val:", y_validate_dataset.shape)
     print("X_test:", X_test_dataset.shape, "y_test:", y_test_dataset.shape)
@@ -56,7 +59,6 @@ def main():
     print(f"Test - fake (0):", (y_test_dataset==0).sum())
     print(f"Test - real (1):", (y_test_dataset==1).sum())
     print("-"*30)
-    '''
 
 if __name__ == "__main__":
     main()
