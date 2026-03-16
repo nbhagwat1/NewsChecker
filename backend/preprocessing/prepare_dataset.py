@@ -7,6 +7,12 @@ import psutil
 from huggingface_hub import hf_hub_download
 import fasttext
 from sentence_transformers import SentenceTransformer
+from multiprocessing import Pool
+
+language_model = None
+detection_model = None
+embedding_model = None
+iteration = 0
 
 def main():
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
@@ -25,44 +31,16 @@ def main():
     y_final_data = []
     failed_data = []
 
-    language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
-    detection_model = fasttext.load_model(language_model)
-    embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+    # process = psutil.Process(os.getpid())
 
-    process = psutil.Process(os.getpid())
-    i = 1
-    for link, label in zip(article_links, article_labels):
-        print(f"Iteration {i}/{len(list(zip(article_links, article_labels)))} is starting!")
+    pool = Pool(processes=6, initializer=initialize_models)
+    results = pool.map(process_article_wrapper, zip(article_links, article_labels))
+    pool.close()
+    pool.join()
 
-        content, title, text_list, additional_information, reason = get_content(link)
-        if content is None:
-            failed_data.append(link)
-            print("Processing failed: Could not get cleaned text")
-        else:
-            translated_content, failed_reason = analyze_language(text_list, detection_model)
-            if translated_content is None:
-                failed_data.append(link)
-                print("Processing failed: Could not translate text")
-                continue
-
-            average_embedding, flags = create_embeddings(translated_content, embedding_model)
-
-            X_final_data.append(average_embedding)
-            y_final_data.append(label)
-
-            '''
-            final_data.append({
-                "link": link,
-                "label": label,
-                "article_text": title + "\n\n" + " ".join(translated_content),
-                "embeddings": embeddings,
-                "flags": flags,
-                "split": None
-            })
-            '''
-        print(f"Article {i} complete")
-        i += 1
-        print("RAM usage (MB):", process.memory_info().rss / 1024 / 1024)
+    failed_data = [result[2] for result in results if result[0] == "Fail"]
+    X_final_data = [result[2][0] for result in results if result[0] == "Success"]
+    y_final_data = [result[2][1] for result in results if result[0] == "Success"]
 
     # print(f"Length of valid articles: {len(final_data)}")
     # print(f"Length of invalid articles: {len(failed_data)}")
@@ -130,6 +108,40 @@ def main():
     np.save(os.path.join(DATA_LOCATION, "training_dataset.npy"), training_set, allow_pickle=True)
     np.save(os.path.join(DATA_LOCATION, "validating_dataset.npy"), validating_set, allow_pickle=True)
     np.save(os.path.join(DATA_LOCATION, "testing_dataset.npy"), testing_set, allow_pickle=True)
+
+def initialize_models():
+    language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
+    detection_model = fasttext.load_model(language_model)
+    embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+
+def process_article_wrapper(article_tuple):
+    return process_article(article_tuple[0], article_tuple[1])
+
+def process_article(link, label):
+    print(f"Iteration {iteration} is beginning!")
+    iteration += 1
+    content, title, text_list, additional_information, reason = get_content(link)
+    if content is None:
+        return "Fail", "Could not get cleaned text", link
+    else:
+        translated_content, failed_reason = analyze_language(text_list, detection_model)
+        if translated_content is None:
+            return "Fail", "Could not translate text", link
+
+        average_embedding, flags = create_embeddings(translated_content, embedding_model)
+
+        return "Success", None, (average_embedding, label)
+
+        '''
+        final_data.append({
+            "link": link,
+            "label": label,
+            "article_text": title + "\n\n" + " ".join(translated_content),
+            "embeddings": embeddings,
+            "flags": flags,
+            "split": None
+        })
+        '''
 
 if __name__ == "__main__":
     main()
