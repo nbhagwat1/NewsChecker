@@ -70,7 +70,7 @@ def get_content(link):
         code = response.status_code
         return None, None, None, None, f"Error code {code}: Complicated (Not a 4xx or 5xx error)"
     
-    print("Got HTML")
+    # print("Got HTML")
 
     website_content = response.text
     # print(website_content)
@@ -86,7 +86,7 @@ def get_content(link):
         else:
             website_title = ""
 
-    print("Got title")
+    # print("Got title")
 
     website_text = ""
     # text_list = []
@@ -102,7 +102,7 @@ def get_content(link):
     structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
 
-    print("Created lists")
+    # print("Created lists")
 
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
@@ -207,7 +207,7 @@ def get_content(link):
                     if decomposed:
                         break
 
-    print("Decomposed unimportant tags")
+    # print("Decomposed unimportant tags")
 
     paragraph_list = []
     if (bool(website_code.find("article"))):
@@ -245,7 +245,7 @@ def get_content(link):
                     structure_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
-    print("Extracted important text from HTML")
+    # print("Extracted important text from HTML")
 
     website_text = re.sub(r'\s+([.,!?;:])', r'\1', website_text) # removes any unnecessary spaces between punctuation and other words
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
@@ -272,7 +272,7 @@ def get_content(link):
         "source_list": source_list
     }
     
-    print("Reached the end of the method")
+    # print("Reached the end of the method")
 
     return cleaned_text, website_title, structure_list, additional_information, None
 
@@ -280,7 +280,7 @@ def analyze_language(segment_list, detection_model):
     # Use FastText to determine the text's language
     # Use HuggingFace / NLLB to translate the text
 
-    print("Created tools")
+    # print("Created tools")
 
     for tokenizer in ["punkt", "punkt_tab"]:
         try:
@@ -289,7 +289,7 @@ def analyze_language(segment_list, detection_model):
             nltk.download('punkt')
             nltk.download('punkt_tab')
 
-    print("Start of creating list")
+    # print("Start of creating list")
 
     initial_list = []
     for paragraph in segment_list:
@@ -317,11 +317,11 @@ def analyze_language(segment_list, detection_model):
     initial_list_copy = initial_list[:]
     final_list = []
 
-    print("Finished creation of list")
+    # print("Finished creation of list")
 
-    print("Start translation")
+    # print("Start translation")
 
-    print(len(initial_list))
+    # print(len(initial_list))
 
     for segment, segment_copy in zip(initial_list, initial_list_copy):
         clean_segment = segment_copy.replace("\n", " ")
@@ -330,7 +330,7 @@ def analyze_language(segment_list, detection_model):
 
         final_text = segment
         if (language.lower() != "eng"):
-            print("Text is not English")
+            # print("Text is not English")
             translation_tool = None
 
             for i in range(3):
@@ -355,7 +355,7 @@ def analyze_language(segment_list, detection_model):
         
         final_list.append(final_text)
     
-    print("Finished translation")
+    # print("Finished translation")
 
     return final_list, None
 
@@ -373,7 +373,7 @@ def create_embeddings(paragraph_list, embedding_model):
             nltk.download('punkt')
             nltk.download('punkt_tab')
 
-    print("Starting process")
+    # print("Starting process")
 
     initial_list = []
     for paragraph in paragraph_list:
@@ -398,8 +398,8 @@ def create_embeddings(paragraph_list, embedding_model):
                     else:
                         initial_list.append(sentence.strip())
     
-    print("Created list of segments")
-    print(f"Length: {len(initial_list)}")
+    # print("Created list of segments")
+    # print(f"Length: {len(initial_list)}")
 
     '''
     for i, segment in enumerate(initial_list):
@@ -420,7 +420,7 @@ def create_embeddings(paragraph_list, embedding_model):
     embeddings = embedding_model.encode(initial_list, batch_size=64, show_progress_bar=False)
     average_embedding = np.mean(embeddings, axis=0)
 
-    print("Created embeddings")
+    # print("Created embeddings")
 
     del embeddings
     del initial_list

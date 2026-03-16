@@ -1,3 +1,5 @@
+from transformers import logging
+logging.set_verbosity_error()
 import os
 import numpy as np
 import pandas as pd
@@ -109,7 +111,13 @@ def main():
     np.save(os.path.join(DATA_LOCATION, "validating_dataset.npy"), validating_set, allow_pickle=True)
     np.save(os.path.join(DATA_LOCATION, "testing_dataset.npy"), testing_set, allow_pickle=True)
 
+    print("PROCESSING FINISHED SUCCESSFULLY")
+
 def initialize_models():
+    global language_model
+    global detection_model
+    global embedding_model
+    
     language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
     detection_model = fasttext.load_model(language_model)
     embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
@@ -118,6 +126,7 @@ def process_article_wrapper(article_tuple):
     return process_article(article_tuple[0], article_tuple[1])
 
 def process_article(link, label):
+    global iteration
     print(f"Iteration {iteration} is beginning!")
     iteration += 1
     content, title, text_list, additional_information, reason = get_content(link)
