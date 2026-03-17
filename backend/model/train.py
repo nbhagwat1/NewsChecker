@@ -60,5 +60,12 @@ def main():
     print(f"Test - real (1):", (y_test_dataset==1).sum())
     print("-"*30)
 
+    for i in range(5):
+        print(y_train_dataset[i], X_train_dataset[i][:5])
+    
+    print(np.isnan(X_train_dataset).any())
+    print(np.isnan(X_validate_dataset).any())
+    print(np.isnan(X_test_dataset).any())
+
 if __name__ == "__main__":
     main()

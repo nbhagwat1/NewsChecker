@@ -78,25 +78,37 @@ def main():
         validating_set = new_final_data[training_count:(training_count + validating_count)]
         testing_set = new_final_data[(training_count + validating_count): len(new_final_data)]
 
-        valid_training_set = False
-        valid_validating_set = False
-        valid_testing_set = False
+        training_set_contains_fake = False
+        training_set_contains_real = False
+        validating_set_contains_fake = False
+        validating_set_contains_real = False
+        testing_set_contains_fake = False
+        testing_set_contains_real = False
 
         for article_tuple in training_set:
             if article_tuple[1] == 0:
-                valid_training_set = True
+                training_set_contains_fake = True
+            elif article_tuple[1] == 1:
+                training_set_contains_real = True
         for article_tuple in validating_set:
             if article_tuple[1] == 0:
-                valid_validating_set = True
+                validating_set_contains_fake = True
+            elif article_tuple[1] == 1:
+                validating_set_contains_real = True
         for article_tuple in testing_set:
             if article_tuple[1] == 0:
-                valid_testing_set = True
+                testing_set_contains_fake = True
+            elif article_tuple[1] == 1:
+                testing_set_contains_real = True
         
-        contains_fake_article = valid_training_set and valid_validating_set and valid_testing_set
+        contains_fake_article = (training_set_contains_fake and training_set_contains_real) and (validating_set_contains_fake and validating_set_contains_real) and (testing_set_contains_fake and testing_set_contains_real)
 
-        valid_training_set = False
-        valid_validating_set = False
-        valid_testing_set = False
+        training_set_contains_fake = False
+        training_set_contains_real = False
+        validating_set_contains_fake = False
+        validating_set_contains_real = False
+        testing_set_contains_fake = False
+        testing_set_contains_real = False
 
     CURRENT_LOCATION = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_LOCATION, "..", ".."))
