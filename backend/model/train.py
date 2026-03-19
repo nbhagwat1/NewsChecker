@@ -60,12 +60,30 @@ def main():
     print(f"Test - real (1):", (y_test_dataset==1).sum())
     print("-"*30)
 
-    for i in range(5):
-        print(y_train_dataset[i], X_train_dataset[i][:5])
-    
-    print(np.isnan(X_train_dataset).any())
-    print(np.isnan(X_validate_dataset).any())
-    print(np.isnan(X_test_dataset).any())
+    a = all(x.shape == (768,) for x in X_train_dataset)
+    b = all(x.shape == (768,) for x in X_validate_dataset)
+    c = all(x.shape == (768,) for x in X_test_dataset)
+    print(f"Consistent shape in train: {a}")
+    print(f"Consistent shape in validate: {b}")
+    print(f"Consistent shape in test: {c}")
+
+    X_train = np.stack(X_train_dataset)
+    d = np.isnan(X_train).any()
+    e = np.isinf(X_train).any()
+    print(f"NaN in train: {d}")
+    print(f"Inf in train: {e}")
+
+    X_validate = np.stack(X_validate_dataset)
+    f = np.isnan(X_validate).any()
+    g = np.isinf(X_validate).any()
+    print(f"NaN in validate: {f}")
+    print(f"Inf in validate: {g}")
+
+    X_test = np.stack(X_test_dataset)
+    h = np.isnan(X_test).any()
+    j = np.isinf(X_test).any()
+    print(f"NaN in test: {h}")
+    print(f"Inf in test: {j}")
 
 if __name__ == "__main__":
     main()

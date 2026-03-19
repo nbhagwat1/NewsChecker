@@ -22,7 +22,7 @@ def main():
     # print(os.cpu_count())
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
-    test_data = news_data.iloc[1500:1540]
+    test_data = news_data.iloc[2500:2700]
 
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
@@ -65,6 +65,12 @@ def main():
     testing_set = []
 
     new_final_data = list(zip(X_final_data, y_final_data))
+    print(f"Embeddings with invalid shape: {len([individual_article for individual_article in new_final_data if individual_article[0].shape != (768,)])}")
+    print(f"Embeddings with NaN: {len([individual_article for individual_article in new_final_data if np.isnan(individual_article[0]).any()])}")
+    print(f"Embeddings with INF: {len([individual_article for individual_article in new_final_data if np.isinf(individual_article[0]).any()])}")
+    
+    valid_data = [individual_article for individual_article in new_final_data if (individual_article[0].shape == (768,) and (not np.isnan(individual_article[0]).any()) and (not np.isinf(individual_article[0]).any()))]
+    new_final_data = valid_data
 
     contains_fake_article = False
     while contains_fake_article == False:
