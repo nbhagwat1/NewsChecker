@@ -40,7 +40,7 @@ def main():
     pool.close()
     pool.join()
 
-    failed_data = [result[2] for result in results if result[0] == "Fail"]
+    failed_data = [result for result in results if result[0] == "Fail"]
     X_final_data = [result[2][0] for result in results if result[0] == "Success"]
     y_final_data = [result[2][1] for result in results if result[0] == "Success"]
 
@@ -60,6 +60,16 @@ def main():
 
     # print(f"{len(X_final_data)} vs. {len(y_final_data)}")
 
+    print(f"Length of successful data: {len(X_final_data)}")
+    print(f"Length of failed data: {len(failed_data)}")
+    print("-----------------")
+    print("FAILED DATA STATS")
+    print(f"HTTP request failed: {len([failure for failure in failed_data if failure[1] == 'HTTP request failed'])}")
+    print(f"Pipeline failed: {len([failure for failure in failed_data if failure[1] == 'Text cleanup function got rid of everything'])}")
+    print(f"Translation failed: {len([failure for failure in failed_data if failure[1] == 'Translation failed'])}")
+    print(f"Other reason: {len([failure for failure in failed_data if (failure[1] != 'HTTP request failed' and failure[1] != 'Text cleanup function got rid of everything' and failure[1] != 'Translation failed')])}")
+    print("-----------------")
+
     training_set = []
     validating_set = []
     testing_set = []
@@ -68,9 +78,10 @@ def main():
     print(f"Embeddings with invalid shape: {len([individual_article for individual_article in new_final_data if individual_article[0].shape != (768,)])}")
     print(f"Embeddings with NaN: {len([individual_article for individual_article in new_final_data if np.isnan(individual_article[0]).any()])}")
     print(f"Embeddings with INF: {len([individual_article for individual_article in new_final_data if np.isinf(individual_article[0]).any()])}")
-    
+
     valid_data = [individual_article for individual_article in new_final_data if (individual_article[0].shape == (768,) and (not np.isnan(individual_article[0]).any()) and (not np.isinf(individual_article[0]).any()))]
     new_final_data = valid_data
+    print(f"Length of new data: {len(new_final_data)}")
 
     contains_fake_article = False
     while contains_fake_article == False:
@@ -149,11 +160,11 @@ def process_article(link, label):
     iteration += 1
     content, title, text_list, additional_information, reason = get_content(link)
     if content is None:
-        return "Fail", "Could not get cleaned text", link
+        return "Fail", reason, link
     else:
         translated_content, failed_reason = analyze_language(text_list, detection_model)
         if translated_content is None:
-            return "Fail", "Could not translate text", link
+            return "Fail", failed_reason, link
 
         average_embedding, flags = create_embeddings(translated_content, embedding_model)
 

@@ -62,13 +62,13 @@ def get_content(link):
             else:
                 reason += "Complicated"
             
-            return None, None, None, None, reason
+            return None, None, None, None, "HTTP request failed"
 
     if response is None:
-        return None, None, None, None, "Program could not get the HTML of the article link fast enough"
+        return None, None, None, None, "HTTP request failed"
     if (response.status_code != 200):
         code = response.status_code
-        return None, None, None, None, f"Error code {code}: Complicated (Not a 4xx or 5xx error)"
+        return None, None, None, None, "HTTP request failed"
     
     # print("Got HTML")
 
@@ -343,10 +343,10 @@ def analyze_language(segment_list, detection_model):
                     if e.response:
                         code = e.response.status_code
                     
-                    return None, f"Erroneous translation of text (Error code: {code})"
+                    return None, "Translation failed"
 
             if translation_tool is None:
-                return None, "Failed to initialize translation tool"
+                return None, "Translation failed"
 
             translated_text = ""
             translated_paragraph = translation_tool(segment, max_length=512, truncation=True, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
