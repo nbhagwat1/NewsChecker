@@ -22,7 +22,7 @@ def main():
     # print(os.cpu_count())
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
-    test_data = news_data.iloc[2500:2700]
+    test_data = news_data.iloc[3500:3700]
 
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
@@ -43,6 +43,7 @@ def main():
     failed_data = [result for result in results if result[0] == "Fail"]
     X_final_data = [result[2][0] for result in results if result[0] == "Success"]
     y_final_data = [result[2][1] for result in results if result[0] == "Success"]
+    language_data = [result[2][2] for result in results if result[0] == "Success"]
 
     # print(f"Length of valid articles: {len(final_data)}")
     # print(f"Length of invalid articles: {len(failed_data)}")
@@ -82,6 +83,11 @@ def main():
     valid_data = [individual_article for individual_article in new_final_data if (individual_article[0].shape == (768,) and (not np.isnan(individual_article[0]).any()) and (not np.isinf(individual_article[0]).any()))]
     new_final_data = valid_data
     print(f"Length of new data: {len(new_final_data)}")
+    print("-----------------")
+    print("LANGUAGE DATA")
+    print(f"Number of English articles: {len([statistic for statistic in language_data if statistic == 'eng'])}")
+    print(f"Number of non-English articles: {len([statistic for statistic in language_data if statistic != 'eng'])}")
+    print("-----------------")
 
     contains_fake_article = False
     while contains_fake_article == False:
@@ -162,13 +168,11 @@ def process_article(link, label):
     if content is None:
         return "Fail", reason, link
     else:
-        translated_content, failed_reason = analyze_language(text_list, detection_model)
-        if translated_content is None:
-            return "Fail", failed_reason, link
+        translated_content, failed_reason, language = analyze_language(text_list, detection_model)
 
         average_embedding, flags = create_embeddings(translated_content, embedding_model)
 
-        return "Success", None, (average_embedding, label)
+        return "Success", None, (average_embedding, label, language)
 
         '''
         final_data.append({

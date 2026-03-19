@@ -323,6 +323,15 @@ def analyze_language(segment_list, detection_model):
 
     # print(len(initial_list))
 
+    segment = initial_list[0]
+    segment_copy = initial_list_copy[0]
+    clean_segment = segment_copy.replace("\n", " ")
+    language_tuple = detection_model.predict(clean_segment)
+    language = language_tuple[0][0][9:12]
+
+    return initial_list, None, language
+
+    '''
     for segment, segment_copy in zip(initial_list, initial_list_copy):
         clean_segment = segment_copy.replace("\n", " ")
         language_tuple = detection_model.predict(clean_segment)
@@ -358,6 +367,7 @@ def analyze_language(segment_list, detection_model):
     # print("Finished translation")
 
     return final_list, None
+    '''
 
 def create_embeddings(paragraph_list, embedding_model):
     # model: SentenceTransformers - all-mpnet-base-v2
