@@ -22,7 +22,7 @@ def main():
     # print(os.cpu_count())
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
-    test_data = news_data.iloc[3500:3700]
+    test_data = news_data.iloc[:]
 
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
