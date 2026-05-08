@@ -41,6 +41,9 @@ def main():
     X_validate_dataset = X_validate_dataset.astype(np.float32)
     X_test_dataset = X_test_dataset.astype(np.float32)
 
+    # print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset)
+
+def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
     print(f"TOTAL ARTICLES: {len(X_train_dataset) + len(X_validate_dataset) + len(X_test_dataset)}")
 
     print("X_train:", X_train_dataset.shape, "y_train:", y_train_dataset.shape)
