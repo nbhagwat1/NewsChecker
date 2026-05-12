@@ -1,5 +1,7 @@
+import joblib
 import os
 import numpy as np
+from sklearn.linear_model import LogisticRegression
 
 def load_datasets():
     DATA_LOCATION = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "clean")
@@ -34,14 +36,12 @@ def main():
     train_dataset, validate_dataset, test_dataset = load_datasets()
 
     X_train_dataset, y_train_dataset = unpack_dataset(train_dataset)
-    X_validate_dataset, y_validate_dataset = unpack_dataset(validate_dataset)
-    X_test_dataset, y_test_dataset = unpack_dataset(test_dataset)
-
     X_train_dataset = X_train_dataset.astype(np.float32)
-    X_validate_dataset = X_validate_dataset.astype(np.float32)
-    X_test_dataset = X_test_dataset.astype(np.float32)
 
-    # print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset)
+    logistic_model = LogisticRegression(max_iter=1000)
+    logistic_model.fit(X_train_dataset, y_train_dataset)
+
+    joblib.dump(logistic_model, "logistic_model.pkl")
 
 def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
     print(f"TOTAL ARTICLES: {len(X_train_dataset) + len(X_validate_dataset) + len(X_test_dataset)}")
