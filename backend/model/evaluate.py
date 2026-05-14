@@ -1,6 +1,6 @@
 import joblib
 import numpy as np
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 from backend.model.train import load_datasets, unpack_dataset, print_stats
 
 def main():
@@ -16,7 +16,7 @@ def main():
     X_validate_dataset = X_validate_dataset.astype(np.float32)
     X_test_dataset = X_test_dataset.astype(np.float32)
 
-    # print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset)
+    print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset)
 
     y_train_prediction = logistic_model.predict(X_train_dataset)
     train_score = accuracy_score(y_train_prediction, y_train_dataset)
@@ -33,7 +33,17 @@ def main():
     print(f"Test dataset accuracy: {test_score}")
 
     real_probability_dataset = logistic_model.predict_proba(X_test_dataset)[:, 1]
-    print(f"Real probability dataset: {real_probability_dataset}")
+    print("Real probability dataset: ")
+    print(real_probability_dataset)
+
+    print("Classification report: ")
+    print(classification_report(y_test_dataset, y_test_prediction))
+    print("")
+
+    auc = roc_auc_score(y_test_dataset, real_probability_dataset)
+    print("ROC-AUC:")
+    print(auc)
+    print("")
 
 if __name__ == "__main__":
     main()

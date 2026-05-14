@@ -38,10 +38,10 @@ def main():
     X_train_dataset, y_train_dataset = unpack_dataset(train_dataset)
     X_train_dataset = X_train_dataset.astype(np.float32)
 
-    logistic_model = LogisticRegression(max_iter=1000)
+    logistic_model = LogisticRegression(max_iter=1000, class_weight='balanced')
     logistic_model.fit(X_train_dataset, y_train_dataset)
 
-    joblib.dump(logistic_model, "logistic_model.pkl")
+    joblib.dump(logistic_model, "logistic_model_v2.pkl")
 
 def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
     print(f"TOTAL ARTICLES: {len(X_train_dataset) + len(X_validate_dataset) + len(X_test_dataset)}")
@@ -49,6 +49,7 @@ def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dat
     print("X_train:", X_train_dataset.shape, "y_train:", y_train_dataset.shape)
     print("X_val:", X_validate_dataset.shape, "y_val:", y_validate_dataset.shape)
     print("X_test:", X_test_dataset.shape, "y_test:", y_test_dataset.shape)
+    print("-"*30)
 
     print(f"Train - total:", len(y_train_dataset))
     print(f"Train - fake (0):", (y_train_dataset==0).sum())
@@ -71,6 +72,7 @@ def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dat
     print(f"Consistent shape in train: {a}")
     print(f"Consistent shape in validate: {b}")
     print(f"Consistent shape in test: {c}")
+    print("-"*30)
 
     X_train = np.stack(X_train_dataset)
     d = np.isnan(X_train).any()
@@ -89,6 +91,7 @@ def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dat
     j = np.isinf(X_test).any()
     print(f"NaN in test: {h}")
     print(f"Inf in test: {j}")
+    print("-"*30)
 
 if __name__ == "__main__":
     main()
