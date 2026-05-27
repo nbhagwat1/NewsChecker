@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NewsChecker | Fake News Detector</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <h1>NewsChecker</h1>
+        <p>Paste the article title and the article text in the following input boxes:</p>
+        <div class="input-area">
+            <p>Title:</p> 
+            <textarea class="title-input"></textarea>
+        </div>
+        <div class="input-area">
+            <p>Article Text:</p> 
+            <textarea class="article-text-input"></textarea>
+        </div>
+        <button onclick="checkArticle()">Submit</button>
+        <div class="result-display">
+            <p class="result-label"></p>
+            <p class="result-score"></p>
+        </div>
+
+        <script src="app.js" defer></script>
+    </body>
+</html>

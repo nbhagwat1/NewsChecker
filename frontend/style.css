@@ -1,0 +1,12 @@
+.title-input {
+    min-height: 2lh;
+    field-sizing: content;
+    width: 1000px;
+}
+
+.article-text-input {
+    min-height: 10lh;
+    field-sizing: content;
+    width: 1000px;
+    margin-bottom: 16px;
+}
