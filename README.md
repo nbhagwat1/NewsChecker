@@ -1,18 +1,18 @@
-### NewsChecker
+# NewsChecker
 
 NewsChecker is an AI-powered fake news detection web application that analyzes online news articles using natural language processing and machine learning to predict whether an article is likely to be real or fake.
 
 ## Project Overview
 
-# What is NewsChecker?
+### What is NewsChecker?
 
 NewsChecker is a machine learning-powered web application that analyzes the content of news articles and predicts whether they are likely to be real or fake. Instead of basing its prediction on specific keywords or manually selected characteristics, the application converts each article into semantic embeddings that capture its overall meaning. Because articles can express the same ideas using different words, this allows the trained machine learning model to make predictions based on the article's content rather than its wording. The model then uses these embeddings to predict whether the article is likely to be real or fake.
 
-# Why I Built It
+### Why I Built It
 
 I built NewsChecker to learn how to create a complete machine learning application, from preparing training data to building a web application that people can use. Instead of only training a machine learning model, I wanted to build the entire system. This included preparing news articles for training by scraping, cleaning, and converting them into embeddings, as well as creating a user interface where people can submit article text and receive a prediction in real time.
 
-# How It Works
+### How It Works
 
 NewsChecker consists of two primary workflows:
 
