@@ -2,6 +2,70 @@
 
 NewsChecker is an AI-powered fake news detection web application that analyzes online news articles using natural language processing and machine learning to predict whether an article is likely to be real or fake.
 
+**Live Demo:** (link)
+
+## How to Run Locally
+
+### 1. Clone the repository
+
+Clone the repository and move into the project directory.
+
+```bash
+git clone https://github.com/yourusername/NewsChecker.git
+cd NewsChecker
+```
+
+### 2. Create and activate a Python virtual environment
+
+A virtual environment creates an isolated Python environment for this project. This keeps NewsChecker's dependencies separate from other Python projects on your computer and helps prevent package version conflicts.
+
+**Windows**
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+**macOS/Linux**
+```bash
+python -m venv .venv # If `python` doesn't work, try `python3` instead.
+source .venv/bin/activate
+```
+
+### 3. Install the required Python dependencies
+
+With the virtual environment activated, install all required dependencies.
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Start the FastAPI server
+
+Launch the backend using Uvicorn.
+
+```bash
+uvicorn backend.main:app --reload --port 8000
+```
+
+
+By default, the API will be available at:
+
+```
+http://127.0.0.1:8000
+```
+
+### 5. Launch the frontend
+
+Launch `index.html` using VS Code's Live Server extension.
+
+Ensure the FastAPI backend is running at:
+
+```
+http://127.0.0.1:8000
+```
+
+Once both the frontend and backend are running, you can begin analyzing news articles.
+
 ## Project Overview
 
 ### What is NewsChecker?
@@ -114,14 +178,6 @@ flowchart TD
     G --> H
 ```
 
-## Machine Learning Pipeline
-
-## Dataset
-
-## Results
-
-## Project Structure
-
-## Installation
-
 ## Future Improvements
+
+## Screenshots
