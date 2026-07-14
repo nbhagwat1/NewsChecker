@@ -107,10 +107,15 @@ Once the model was trained, the preprocessing pipeline was no longer needed duri
 
 ## Tech Stack
 **Frontend:** HTML, CSS, JavaScript
+
 **Backend:** FastAPI
+
 **Machine Learning:** Scikit-learn, SentenceTransformers
+
 **Data Processing & Web Scraping:** NumPy, Pandas, BeautifulSoup
+
 **Development Environment:** Jupyter Notebook, VS Code
+
 **Version Control:** Git, GitHub
 
 ## Architecture Diagram
@@ -179,5 +184,23 @@ flowchart TD
 ```
 
 ## Future Improvements
+
+### Improved Fact Verification
+Currently, NewsChecker primarily analyzes article text and linguistic patterns. Future versions could incorporate external fact-checking sources and trusted databases to compare claims against verified information.
+
+### Better Explainability
+Add explainable AI features to show users why an article received a particular prediction, such as highlighting influential sentences or identifying suspicious patterns.
+
+### Advanced Source Analysis
+Incorporate additional signals such as publisher reputation, article metadata, publication history, and author credibility to improve prediction accuracy.
+
+### Improved Multilingual Support
+Expand multilingual capabilities by supporting more languages and improving translation quality before generating embeddings.
+
+### Continuous Model Improvement
+Develop a pipeline for collecting new examples, retraining models, and monitoring performance as misinformation techniques evolve.
+
+### Multimodal Misinformation Detection
+Future versions could analyze images, videos, and other types of content to determine how likely they are to be real or misleading.
 
 ## Screenshots
