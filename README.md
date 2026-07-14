@@ -4,6 +4,16 @@ NewsChecker is an AI-powered fake news detection web application that analyzes o
 
 **Live Demo:** (link)
 
+## Table of Contents
+
+- Project Overview
+- Screenshots
+- Features
+- Tech Stack
+- Architecture Diagram
+- How to Run Locally
+- Future Improvements
+
 ## Project Overview
 
 ### What is NewsChecker?
