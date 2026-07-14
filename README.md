@@ -204,3 +204,27 @@ Develop a pipeline for collecting new examples, retraining models, and monitorin
 Future versions could analyze images, videos, and other types of content to determine how likely they are to be real or misleading.
 
 ## Screenshots
+
+### Initial Application Interface
+
+![Initial Application Interface](images/application.png)
+
+*Figure 1. The initial interface presented to the user upon loading the application.*
+
+### Article Entered Before Analysis
+
+![Article Entered Before Analysis](images/article.png)
+
+*Figure 2. A news article is entered into the input field before analysis.*
+
+### Classification Results Displayed
+
+![Classification Results Displayed](images/result.png)
+
+*Figure 3. After submission, the application displays the predicted label and confidence score.*
+
+### Empty Submission Error Message
+
+![Empty Submission Error Message](images/error.png)
+
+*Figure 4. If the user submits the form without entering article text, the application displays an error message.*
