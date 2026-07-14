@@ -5,12 +5,12 @@ async function testAPI() {
 }
 
 async function checkArticle() {
-    const title = document.querySelector(".title-input").value;
     const articleText = document.querySelector(".article-text-input").value;
 
-    if (title === "" || articleText === "") {
+    if (articleText === "") {
         document.querySelector(".result-label").textContent = "The title and the actual text of the article are required.";
         document.querySelector(".result-label").style.color = "rgb(255, 0, 0)";
+        document.querySelector(".result-score").textContent = "";
         return;
     }
 
