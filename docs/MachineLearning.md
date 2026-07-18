@@ -2,6 +2,14 @@
 
 This document focuses on the machine learning component of NewsChecker, including the dataset, model selection, training process, evaluation, and current limitations. The preprocessing pipeline and overall application architecture are documented in the README.
 
+## Table of Contents
+
+- Dataset
+- Model
+- Evaluation
+- Limitations
+- Future Improvements
+
 ## Dataset
 
 NewsChecker was trained using a publicly available Kaggle dataset containing URLs to news articles labeled for fake news detection. Each article is assigned a binary label, where 0 represents fake news and 1 represents real news. The dataset can be found [here.](https://www.kaggle.com/datasets/algord/fake-news)
@@ -78,6 +86,66 @@ Making a prediction for a news article usually takes a few seconds. Most of this
 
 ## Evaluation
 
+The trained model was evaluated using a test dataset of 1,657 articles. Of those articles, 383 (23.1%) were fake news articles and 1,274 (76.9%) were real news articles. The model's performance was evaluated using the following classification metrics: accuracy, precision, recall, F1-score, and ROC-AUC.
+
+### Metric Interpretation
+
+#### Accuracy (76.16%)
+
+The model correctly predicted 76.16% of the articles in the test dataset, indicating that it can accurately classify new articles.
+
+#### Precision
+
+- Class 0 (Fake News) Precision: 0.49 — Of all the articles that the model predicted to be fake news, 49% were actually fake news, while the remaining 51% were actually real news. This indicates that the model frequently misclassifies real news articles as fake news.
+- Class 1 (Real News) Precision: 0.89 — Of all the articles that the model predicted to be real news, 89% were actually real news, while the remaining 11% were actually fake news. This indicates that when the model predicts an article as real news, it is usually correct.
+
+#### Recall
+
+- Class 0 (Fake News) Recall: 0.69 — Of the 383 fake news articles in the test dataset, the model correctly identified approximately 69% of them as fake.
+- Class 1 (Real News) Recall: 0.78 — Of the 1,274 real news articles in the test dataset, the model correctly identified approximately 78% of them as real.
+
+#### F1-Score
+
+- Class 0 (Fake News) F1-Score: 0.57 — The model achieved moderate overall performance for fake news classification. While it correctly identified approximately 69% of fake news articles in the test dataset, its lower precision score of 49% shows that a significant portion of its fake news predictions were incorrect, resulting in a lower overall F1-score.
+- Class 1 (Real News) F1-Score: 0.83 — The model achieved strong overall performance for real news classification. It correctly identified approximately 78% of the real news articles in the test dataset. Additionally, when the model predicted an article as real news, 89% of those predictions were correct, meaning that most real news predictions were reliable. These results demonstrate that the model performed better when classifying real news compared to fake news, achieving an F1-score of 0.83 compared to 0.57 for fake news.
+
+#### ROC-AUC (0.8082)
+
+The model achieved a ROC-AUC score of 0.8082, indicating that it can effectively distinguish between fake and real news articles based on their predicted probabilities. This means that the model assigns a higher probability score to a randomly selected real news article than to a randomly selected fake news article approximately 80.82% of the time.
+
+### Confusion Matrix
+
+|                  | Predicted Fake News | Predicted Real News |
+| :--------------: | :-----------------: | :-----------------: |
+| Actual Fake News | 265                 | 118                 |
+| Actual Real News | 277                 | 998                 |
+
+### Analysis
+
+The evaluation results show that the NewsChecker classifier was able to successfully learn patterns from the training data and apply them to articles that were not included during training. The model performed particularly well when identifying Class 1 (Real News) articles, demonstrating strong performance for this class.
+
+However, the classifier was less effective at identifying Class 0 (Fake News) articles. This difference in performance may be partially explained by the distribution of the test dataset, which contained substantially more Class 1 (Real News) articles than Class 0 (Fake News) articles. Because the model had more examples from Class 1 (Real News) available during training, it may have learned stronger patterns for identifying that class.
+
+The evaluation results show that the data preparation, feature extraction, and model training pipeline allowed the classifier to learn patterns that help distinguish between the two classes. However, the incorrect predictions show that further improvements are needed, especially to reduce errors when classifying Class 0 (Fake News) articles.
+
 ## Limitations
 
+Although the model demonstrates reasonable performance on unseen articles, several limitations remain.
+
+First, the model's effectiveness depends heavily on the quality and diversity of the training dataset. While the dataset includes articles from a variety of news sources and domains, the labels were created by the original dataset author. Additionally, the dataset's coverage of different topics and languages is not fully documented, making it unclear how well the model performs on different types of news content.
+
+Second, the classifier evaluates articles based only on their textual content. Although sentence embeddings allow the model to understand the semantic meaning of an article, the system does not verify claims using external sources or compare information with other news articles. Therefore, the model functions as a content-based classifier rather than a complete fact-checking system.
+
+Finally, the model has limited explainability. Because predictions are based on patterns learned from article text, the model cannot identify or communicate the specific factors that led to a particular classification. As a result, users may not understand why an article was classified as real or fake.
+
 ## Future Improvements
+
+There are several improvements that I would like to make to NewsChecker in the future.
+
+First, the training pipeline could be refined to produce higher-quality training data. During development, several issues were identified that prevented certain articles from being processed correctly. Improving the preprocessing pipeline and regenerating the training data would likely produce a cleaner dataset and improve the model's overall performance.
+
+Second, the model itself could be improved by experimenting with different classifiers and embedding models. Additionally, continuously retraining the model with newer articles, expanding the dataset to include more languages, and maintaining a more balanced distribution of real and fake news articles could improve the model's ability to accurately classify articles it has never seen before.
+
+Third, I would like to expand the model by using additional input features during the prediction process. Currently, the model uses only the text of an article as input when making a prediction. In the future, I would like to provide the model with additional input features, such as publisher credibility, domain reputation, author information, and other relevant metadata, to improve the accuracy of its predictions.
+
+Finally, I would like to improve the overall user experience by making the model's predictions easier to understand. While the application currently displays a truthfulness label and a confidence score, it does not explain why the model reached its conclusion. In the future, I would like the application to provide users with an explanation of the factors that most influenced each prediction, allowing them to better understand and interpret the results. Additionally, I would like to further refine the web application's user interface by creating a more modern, polished, and visually appealing design.
