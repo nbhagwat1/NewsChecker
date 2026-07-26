@@ -3,6 +3,22 @@ import random
 from backend.preprocessing.text_extraction import get_content
 
 def main():
+    """
+    Examines the results of the training pipeline successfully extracting the main
+    article content from many article URLs.
+
+    This method finds 60 article URLs that the training pipeline can successfully
+    extract the main article content from. Once it successfully extracts the main
+    article content from those 60 article URLs, it prints the extracted article
+    content.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+    
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
     test_data = news_data.iloc[:]

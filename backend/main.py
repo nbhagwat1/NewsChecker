@@ -5,7 +5,7 @@ from huggingface_hub import hf_hub_download
 import fasttext
 from sentence_transformers import SentenceTransformer
 import joblib
-from backend.preprocessing.text_extraction import analyze_language, create_embeddings
+from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
 from pydantic import BaseModel
 
 logistic_model = None
@@ -59,7 +59,7 @@ def check(article: NewsArticle):
     text_list = []
     text_list.append(article.text)
 
-    segments, placeholder, language = analyze_language(text_list, detection_model)
+    segments, placeholder, language = segment_text_and_detect_language(text_list, detection_model)
     embeddings, suspicious_factors = create_embeddings(segments, embedding_model)
 
     embedding_list = []

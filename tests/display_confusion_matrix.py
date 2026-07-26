@@ -4,6 +4,27 @@ import joblib
 from backend.model.train import load_datasets, unpack_dataset
 
 def main():
+    """
+    Displays the confusion matrix that represents the trained machine
+    learning model's performance when predicting the binary truthfulness
+    label for the embeddings in the testing dataset.
+
+    This method loads the trained logistic regression model and the
+    testing dataset, has the model predict the binary truthfulness label
+    (0 = fake news, 1 = real news) for each embedding in the testing
+    dataset, and displays the confusion matrix that describes the trained
+    model's performance when it predicts the binary truthfulness label of
+    each embedding in the testing dataset and how that predicted label
+    compares to the actual binary truthfulness label of each embedding
+    in the testing dataset.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+
     logistic_model = joblib.load("logistic_model.pkl")
 
     train_dataset, validate_dataset, test_dataset = load_datasets()

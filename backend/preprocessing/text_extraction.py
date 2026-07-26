@@ -14,6 +14,21 @@ import time
 import gc
 
 def examine_link(link):
+    """
+    Checks if the specified parameter is a valid link.
+
+    This method checks if the specified parameter contains exactly
+    one '.' character and no empty spaces. If the specified parameter
+    does, then it is a valid link, and the method does nothing. 
+    Otherwise, the specified parameter is not a valid link, and the
+    running program terminates.
+
+    Args:
+        link (str): The link that will be checked for validity
+
+    Returns:
+        None
+    """
     link = link.strip().lower()
 
     empty_count = 0
@@ -28,6 +43,26 @@ def examine_link(link):
         exit(0)
 
 def get_content(link):
+    """
+    Extracts the main text content from a news article URL.
+
+    Retrieves the webpage HTML through an HTTP request, uses BeautifulSoup
+    to process the page structure, and removes unnecessary content such as
+    scripts, navigation menus, and advertisements to extract the main article text.
+
+    Args:
+        link (str): The URL of the news article whose main content will be extracted.
+    
+    Returns:
+        str: The main article text of the news article that the URL leads to.
+        str: The title of the news article that the URL leads to.
+        list[str]: List of text segments that together make up the main article content.
+        dict: Information removed from the main article content that may still be useful
+        for assessing the article's trustworthiness.
+        str: An error message that explains why the method failed to extract the main
+        text content from the inputted news article URL (if necessary).
+    """
+
     if (link is None) or (isinstance(link, float) and math.isnan(link)):
         return None, None, None, None, "Link is missing"
 
@@ -70,10 +105,8 @@ def get_content(link):
         code = response.status_code
         return None, None, None, None, "HTTP request failed"
     
-    # print("Got HTML")
 
     website_content = response.text
-    # print(website_content)
     website_code = BeautifulSoup(website_content, 'html.parser')
 
     heading = website_code.find("h1") # CHANGE - May not be safe to use later
@@ -86,27 +119,19 @@ def get_content(link):
         else:
             website_title = ""
 
-    # print("Got title")
-
     website_text = ""
-    # text_list = []
     time_list = []
     emphasized_text_list = []
     footer_information = []
     recommended_list = []
-    # tag_list = []
     menu_list = []
     publish_list = []
-    # external_list = []
     source_list = []
     structure_list = []
     distracting_words = ["click here", "learn more", "check out", "this article originally appeared", "subscribe", "premium", "originally published"]
 
-    # print("Created lists")
-
     for tag in website_code(["script", "style", "noscript", "meta", "header", "footer", "img", "nav", "aside", "style", "figcaption", "button"]):
         tag.decompose()
-        # a = 1
     for tag in website_code("a"):
         for word in distracting_words:
             if word in tag.get_text(strip=True).lower():
@@ -159,7 +184,6 @@ def get_content(link):
         class_list = tag.get('class', [])
         data = tag.get("data-testid")
         important_words = ["metadata", "social-link", "social-share", "social-bookmark", "follow-topics", "footnote", "caption", "byline", "subscribe", "newsletter", "footer", "headline", "promotion", "prism-card", "recommended", "licensing", "button", "description", "infobox", "menu", "publish", "boilerplate", "source"]
-        # important_words = ["abcdefghijk"]
         decomposed = False
 
         if data or class_list:
@@ -207,8 +231,6 @@ def get_content(link):
                     if decomposed:
                         break
 
-    # print("Decomposed unimportant tags")
-
     paragraph_list = []
     if (bool(website_code.find("article"))):
         article = website_code.find("article")
@@ -245,8 +267,6 @@ def get_content(link):
                     structure_list.append(paragraph.get_text(" ", strip=True))
     website_text = " ".join(paragraph_list)
 
-    # print("Extracted important text from HTML")
-
     website_text = re.sub(r'\s+([.,!?;:])', r'\1', website_text) # removes any unnecessary spaces between punctuation and other words
     website_text = re.sub(r'\s+', ' ', website_text) # replaces any sequence of 2+ spaces with a single space
     website_text = re.sub(r'\n+', '\n', website_text) # replaces any sequence of 2+ newline characters with a single newline character
@@ -271,16 +291,28 @@ def get_content(link):
         "publish_list": publish_list,
         "source_list": source_list
     }
-    
-    # print("Reached the end of the method")
 
     return cleaned_text, website_title, structure_list, additional_information, None
 
-def analyze_language(segment_list, detection_model):
-    # Use FastText to determine the text's language
-    # Use HuggingFace / NLLB to translate the text
+def segment_text_and_detect_language(segment_list, detection_model):
+    """
+    Combines the extracted article text into segments of up to 300 words and detects the 
+    language of the article.
 
-    # print("Created tools")
+    The input text segments are combined in their original order into segments of up to 
+    300 words, which are stored in a list. The method also detects the article's language.
+
+    Args:
+        segment_list (list[str]): List of text segments that together make up the main article content.
+        detection_model: Loaded fastText language detection model.
+
+    Returns:
+        list[str]: List of text segments of up to 300 words that together make up the main article content.
+        str: Error message that explains why the method failed to execute (if necessary)
+        str: The language of the article text
+    """
+    
+    # Use FastText to determine the text's language
 
     for tokenizer in ["punkt", "punkt_tab"]:
         try:
@@ -288,8 +320,6 @@ def analyze_language(segment_list, detection_model):
         except LookupError:
             nltk.download('punkt')
             nltk.download('punkt_tab')
-
-    # print("Start of creating list")
 
     initial_list = []
     for paragraph in segment_list:
@@ -317,12 +347,6 @@ def analyze_language(segment_list, detection_model):
     initial_list_copy = initial_list[:]
     final_list = []
 
-    # print("Finished creation of list")
-
-    # print("Start translation")
-
-    # print(len(initial_list))
-
     segment = initial_list[0]
     segment_copy = initial_list_copy[0]
     clean_segment = segment_copy.replace("\n", " ")
@@ -331,50 +355,27 @@ def analyze_language(segment_list, detection_model):
 
     return initial_list, None, language
 
-    '''
-    for segment, segment_copy in zip(initial_list, initial_list_copy):
-        clean_segment = segment_copy.replace("\n", " ")
-        language_tuple = detection_model.predict(clean_segment)
-        language = language_tuple[0][0][9:12]
-
-        final_text = segment
-        if (language.lower() != "eng"):
-            # print("Text is not English")
-            translation_tool = None
-
-            for i in range(3):
-                try:
-                    translation_tool = pipeline("translation", model="facebook/nllb-200-distilled-600M")
-                except HfHubHTTPError as e:
-                    time.sleep(2)
-                except Exception as e:
-                    code = 0
-                    if e.response:
-                        code = e.response.status_code
-                    
-                    return None, "Translation failed"
-
-            if translation_tool is None:
-                return None, "Translation failed"
-
-            translated_text = ""
-            translated_paragraph = translation_tool(segment, max_length=512, truncation=True, src_lang=language_tuple[0][0][9:len(language_tuple[0][0])], tgt_lang="eng_Latn")
-            translated_text += translated_paragraph[0]['translation_text']
-            final_text = translated_text.strip()
-        
-        final_list.append(final_text)
-    
-    # print("Finished translation")
-
-    return final_list, None
-    '''
-
 def create_embeddings(paragraph_list, embedding_model):
+    """
+    Generates a semantic embedding for an article and checks for suspicious characteristics.
+
+    The method groups the extracted article text into segments of up to 300 words. The method
+    then uses the inputted embedding model to encode each of these segments into a high-dimensional 
+    semantic embedding. All of these embeddings are then averaged to create a single embedding for 
+    the entire article. Finally, the method checks the generated embedding for potential quality issues, 
+    such as insufficient content, invalid values, unusual segment lengths, or low variation.
+
+    Args:
+        paragraph_list (list[str]): List of text segments that together make up the main article content.
+        embedding_model: SentenceTransformer model used to generate semantic embeddings.
+    
+    Returns:
+        np.ndarray: A fixed-length embedding that captures the meaning of the entire article.
+        dict: A dictionary that contains details about the suspicious characteristics of the embedding.
+    """
+
     # model: SentenceTransformers - all-mpnet-base-v2
     # Use SentenceTransformers to convert text into an embedding
-
-    
-    # print(embedding_model.device)
     
     for tokenizer in ["punkt", "punkt_tab"]:
         try:
@@ -382,8 +383,6 @@ def create_embeddings(paragraph_list, embedding_model):
         except LookupError:
             nltk.download('punkt')
             nltk.download('punkt_tab')
-
-    # print("Starting process")
 
     initial_list = []
     for paragraph in paragraph_list:
@@ -407,14 +406,6 @@ def create_embeddings(paragraph_list, embedding_model):
                         paragraph_words = len(sentence.split())
                     else:
                         initial_list.append(sentence.strip())
-    
-    # print("Created list of segments")
-    # print(f"Length: {len(initial_list)}")
-
-    '''
-    for i, segment in enumerate(initial_list):
-        print(f"Index {i + 1}: {segment}")
-    '''
 
     segment_count = len(initial_list)
     if segment_count > 2000:
@@ -430,15 +421,12 @@ def create_embeddings(paragraph_list, embedding_model):
     embeddings = embedding_model.encode(initial_list, batch_size=64, show_progress_bar=False)
     average_embedding = np.mean(embeddings, axis=0)
 
-    # print("Created embeddings")
-
     del embeddings
     del initial_list
     gc.collect()
 
     suspicious_factors = {}
 
-    '''
     total_word_count = 0
     for segment in initial_list:
         total_word_count += len(segment.split())
@@ -451,12 +439,9 @@ def create_embeddings(paragraph_list, embedding_model):
         "low_variance": False
     }
 
-    # print(np.var(embeddings, axis=0).mean())
-
     suspicious_factors["too_short"] = embeddings.shape[0] < 3
     suspicious_factors["all_zero"] = np.all(embeddings == 0)
     suspicious_factors["extreme_segment_length"] = not (30 <= average_word_count <= 200)
     suspicious_factors["low_variance"] = np.var(embeddings, axis=0).mean() <= 0.001
-    '''
 
     return average_embedding, suspicious_factors

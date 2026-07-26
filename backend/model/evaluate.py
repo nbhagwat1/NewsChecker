@@ -4,6 +4,31 @@ from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
 from backend.model.train import load_datasets, unpack_dataset, print_stats
 
 def main():
+    """
+    Prints important information about the trained machine learning model's performance
+    when it predicts the truthfulness of an article.
+
+    This method loads the trained logistic regression model as well as the training, 
+    validation, and testing datasets. The method takes the training, validation, and 
+    testing datasets and splits each one into its embeddings and their respective 
+    binary truthfulness labels (0 = fake news, 1 = real news). The method then prints 
+    information about the number of real news articles and fake news articles in each 
+    of the three datasets. It also checks to make sure that the embeddings in each of 
+    the three datasets contain valid values and have the same shape as each other. 
+    After that, the method has the trained model make predictions on the embeddings
+    in the training, validation, and testing datasets, and it prints the model's
+    accuracy when making predictions on the embeddings in each of the three datasets.
+    Finally, the method prints information about important metrics, such as precision,
+    recall, F1-score, and ROC-AUC, that provide valuable data about the trained model's 
+    performance when making predictions.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+
     logistic_model = joblib.load("logistic_model.pkl")
 
     train_dataset, validate_dataset, test_dataset = load_datasets()

@@ -4,6 +4,21 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 
 def load_datasets():
+    """
+    Loads and returns the training, validation, and testing datasets.
+
+    This method loads the training, validation, and testing datasets from their
+    respective .npy files and returns them.
+
+    Args:
+        None
+    
+    Returns:
+        list[tuple[np.ndarray, int]]: The training dataset.
+        list[tuple[np.ndarray, int]]: The validation dataset.
+        list[tuple[np.ndarray, int]]: The testing dataset.
+    """
+
     DATA_LOCATION = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "clean")
 
     train_file = os.path.join(DATA_LOCATION, "training_dataset.npy")
@@ -17,6 +32,26 @@ def load_datasets():
     return train_dataset, validate_dataset, test_dataset
 
 def unpack_dataset(dataset):
+    """
+    Splits a dataset into two lists, with one list containing all of the
+    singular embeddings and the other list containing all of the binary
+    truthfulness labels.
+
+    This method accepts a list of tuples, where each tuple contains an
+    embedding and its respective binary truthfulness label. The method
+    puts all of the embeddings in one list and all of the binary
+    truthfulness labels in another list. In the end, the method returns
+    both of these lists.
+
+    Args:
+        dataset (list[tuple[np.ndarray, int]]): A list of tuples, where each tuple contains an
+        embedding and its respective binary truthfulness label.
+    
+    Returns:
+        np.ndstack: A list of all of the singular embeddings in the inputted dataset.
+        np.ndarray: A list of all of the binary truthfulness labels in the inputted dataset.
+    """
+
     X_list = []
     y_list = []
 
@@ -33,6 +68,27 @@ def unpack_dataset(dataset):
     return X_dataset, y_dataset
 
 def main():
+    """
+    Trains a logistic regression model with the training dataset and
+    saves the trained model.
+
+    This method loads the training, validation, and testing datasets. Then,
+    it takes the training dataset and splits it into two lists: a list containing
+    the dataset's singular embeddings and a list containing the embeddings'
+    respective binary truthfulness labels. After that, the method creates a new
+    logistic regression model and trains it using the training dataset, with the
+    model's input features being the dataset's singular embeddings and the model's
+    target labels being the embeddings' respective binary truthfulness labels.
+    Once the model has been trained, it is saved to a file so that it can be loaded
+    and used later without needing to be retrained.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+
     train_dataset, validate_dataset, test_dataset = load_datasets()
 
     X_train_dataset, y_train_dataset = unpack_dataset(train_dataset)
@@ -44,6 +100,26 @@ def main():
     joblib.dump(logistic_model, "logistic_model_v2.pkl")
 
 def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
+    """
+    Prints valuable statistics about the training dataset, the validation dataset, and the testing dataset.
+
+    This method prints information about the training dataset, the validation dataset, and the testing dataset, printing
+    information about the number of real news articles in each dataset, the number of fake news articles in each dataset,
+    whether or not the singular embeddings in each dataset have the same shape, and whether or not the singular embeddings
+    in each dataset contain valid numerical values.
+
+    Args:
+        X_train_dataset (list[np.ndarray]): The list of all singular embeddings in the training dataset.
+        X_validate_dataset (list[np.ndarray]): The list of all singular embeddings in the validation dataset.
+        X_test_dataset (list[np.ndarray]): The list of all singular embeddings in the testing dataset.
+        y_train_dataset (list[int]): The list of all binary truthfulness labels in the training dataset.
+        y_validate_dataset (list[int]): The list of all binary truthfulness labels in the validation dataset.
+        y_test_dataset (list[int]): The list of all binary truthfulness labels in the testing dataset.
+    
+    Returns:
+        None
+    """
+
     print(f"TOTAL ARTICLES: {len(X_train_dataset) + len(X_validate_dataset) + len(X_test_dataset)}")
 
     print("X_train:", X_train_dataset.shape, "y_train:", y_train_dataset.shape)

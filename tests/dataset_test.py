@@ -2,6 +2,19 @@ import numpy as np
 import os
 
 def main():
+    """
+    Prints relevant information about the training, validation, and testing datasets.
+
+    This method loads the training, validation, and testing datasets from their respective
+    .npy files, and it prints information about each dataset's data type, shape, and contents.
+    
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+    
     DATA_LOCATION = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "clean")
 
     train_file = os.path.join(DATA_LOCATION, "training_dataset.npy")

@@ -3,7 +3,7 @@ logging.set_verbosity_error()
 import os
 import numpy as np
 import pandas as pd
-from backend.preprocessing.text_extraction import get_content, analyze_language, create_embeddings
+from backend.preprocessing.text_extraction import get_content, segment_text_and_detect_language, create_embeddings
 import random
 import psutil
 from huggingface_hub import hf_hub_download
@@ -17,9 +17,40 @@ embedding_model = None
 iteration = 0
 
 def main():
-    news_data = pd.read_csv("data/original/FakeNewsNet.csv")
+    """
+    Runs the entire original dataset of article URLs through the training
+    pipeline to produce the new and cleaned dataset, prints information relevant
+    to the training pipeline's performance, splits the new and cleaned dataset
+    into training, validation, and testing datasets, and saves the training,
+    validation, and testing datasets as .npy files.
 
-    # print(os.cpu_count())
+    The method loads the .csv file that contains the original dataset and retrieves
+    the set of article URLs and their respective binary labels that signify their
+    truthfulness. The method then creates a pool of six worker processes that concurrently
+    process the article URLs and their respective binary truthfulness labels. Once the
+    entire original dataset has been processed, the method prints important information
+    related to the training pipeline's performance, such as how many article URLs it
+    successfully processed, how many article URLs it didn't successfully process, and
+    how many article URLs it didn't successfully process because of a certain reason.
+    After that, the method takes the article URLs that were successfully processed and
+    adds their resulting embeddings to one dataset and their respective binary
+    truthfulness labels to another dataset. Once that is done, the method pairs each
+    embedding with its respective binary truthfulness label and creates a new dataset
+    consisting of those pairs using the built-in zip() function. The method then splits 
+    that dataset into a training dataset, a validation dataset, and a testing dataset
+    using a 70/15/15 split, ensuring that each dataset contains at least one embedding
+    that captures the meaning of a fake news article. Finally, the method saves each of
+    the three datasets (the training dataset, the validation dataset, and the testing
+    dataset) as .npy files in the `data/clean` directory of the NewsChecker project.
+
+    Args:
+        None
+    
+    Returns:
+        None
+    """
+
+    news_data = pd.read_csv("data/original/FakeNewsNet.csv")
 
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
     test_data = news_data.iloc[:]
@@ -27,13 +58,9 @@ def main():
     article_links = test_data['news_url'].tolist()
     article_labels = test_data['real'].tolist()
 
-    # print(len(article_links))
-
     X_final_data = []
     y_final_data = []
     failed_data = []
-
-    # process = psutil.Process(os.getpid())
 
     pool = Pool(processes=6, initializer=initialize_models)
     results = pool.map(process_article_wrapper, zip(article_links, article_labels))
@@ -44,22 +71,6 @@ def main():
     X_final_data = [result[2][0] for result in results if result[0] == "Success"]
     y_final_data = [result[2][1] for result in results if result[0] == "Success"]
     language_data = [result[2][2] for result in results if result[0] == "Success"]
-
-    # print(f"Length of valid articles: {len(final_data)}")
-    # print(f"Length of invalid articles: {len(failed_data)}")
-
-    '''
-    fake_article_count = 0
-    for valid_article in final_data:
-        if valid_article['label'] == 0:
-            fake_article_count += 1
-    
-    print("\n")
-    print(f"Fake articles: {fake_article_count}")
-    print(f"Real articles: {len(final_data) - fake_article_count}")
-    '''
-
-    # print(f"{len(X_final_data)} vs. {len(y_final_data)}")
 
     print(f"Length of successful data: {len(X_final_data)}")
     print(f"Length of failed data: {len(failed_data)}")
@@ -95,7 +106,6 @@ def main():
 
         training_count = int(0.7 * len(new_final_data))
         validating_count = int(0.15 * len(new_final_data))
-        # testing_count = len(new_final_data) - training_count - validating_count
 
         training_set = new_final_data[0:training_count]
         validating_set = new_final_data[training_count:(training_count + validating_count)]
@@ -149,6 +159,22 @@ def main():
     print("PROCESSING FINISHED SUCCESSFULLY")
 
 def initialize_models():
+    """
+    Initializes all of the models that the pipeline needs to
+    process the articles in the original dataset.
+
+    This method loads and initializes the models that the
+    pipeline uses to detect the article's text's language
+    and generate an embedding that captures the meaning of
+    the article.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+
     global language_model
     global detection_model
     global embedding_model
@@ -158,9 +184,52 @@ def initialize_models():
     embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
 def process_article_wrapper(article_tuple):
+    """
+    Wrapper function used by multiprocessing workers.
+
+    Calls the standard article processing function so that articles can be
+    processed concurrently using Pool.map().
+
+    Args:
+        article_tuple (tuple[str, str]): A tuple that contains an article's URL and a binary label that
+        represents the article's truthfulness.
+    
+    Returns:
+        str: A string that states whether or not the training pipeline successfully processed the article URL.
+        str: A string that explains why the training pipeline failed to process the article URL (if necessary).
+        tuple[np.ndarray, int, str]: A tuple that contains the single embedding that captures the meaning of the
+        article, a binary label that represents the truthfulness of the article, and a string that states the
+        language of the article's text.
+    """
+
     return process_article(article_tuple[0], article_tuple[1])
 
 def process_article(link, label):
+    """
+    Runs the URL of an article through the training pipeline and returns
+    the finishing result along with the article's respective binary label
+    that represents its truthfulness.
+
+    This method takes the inputted article URL, extracts its main article
+    content, divides this main article content into segments of up to 
+    300 words, detects the language of this main article content, and
+    generates a single embedding that captures the meaning of the article.
+    The method then returns this single embedding, a string that represents
+    the detected language of the article, and a binary number that represents
+    the truthfulness of the article (0 = fake news, 1 = real news).
+
+    Args:
+        link (str): The article's URL.
+        label (int): A binary label that represents the article's truthfulness.
+    
+    Returns:
+        str: A string that states whether or not the training pipeline successfully processed the article URL.
+        str: A string that explains why the training pipeline failed to process the article URL (if necessary).
+        tuple[np.ndarray, int, str]: A tuple that contains the single embedding that captures the meaning of the
+        article, a binary label that represents the truthfulness of the article, and a string that states the
+        language of the article's text.
+    """
+
     global iteration
     print(f"Iteration {iteration} is beginning!")
     iteration += 1
@@ -168,22 +237,11 @@ def process_article(link, label):
     if content is None:
         return "Fail", reason, link
     else:
-        translated_content, failed_reason, language = analyze_language(text_list, detection_model)
+        translated_content, failed_reason, language = segment_text_and_detect_language(text_list, detection_model)
 
         average_embedding, flags = create_embeddings(translated_content, embedding_model)
 
         return "Success", None, (average_embedding, label, language)
-
-        '''
-        final_data.append({
-            "link": link,
-            "label": label,
-            "article_text": title + "\n\n" + " ".join(translated_content),
-            "embeddings": embeddings,
-            "flags": flags,
-            "split": None
-        })
-        '''
 
 if __name__ == "__main__":
     main()
