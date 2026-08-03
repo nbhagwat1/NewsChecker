@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 from backend.preprocessing.text_extraction import get_content, segment_text_and_detect_language, create_embeddings
 import random
-import psutil
 from huggingface_hub import hf_hub_download
 import fasttext
 from sentence_transformers import SentenceTransformer
@@ -52,6 +51,8 @@ def main():
 
     news_data = pd.read_csv("data/original/FakeNewsNet.csv")
 
+    # Randomly shuffle the dataset before further processing while making
+    # sure it is shuffled the same way every time the program runs.
     news_data = news_data.sample(frac=1, random_state=42).reset_index(drop=True)
     test_data = news_data.iloc[:]
 
@@ -62,15 +63,26 @@ def main():
     y_final_data = []
     failed_data = []
 
+    # Process multiple articles at the same time to reduce the total
+    # preprocessing time. Six worker processes are used to balance
+    # performance and system resource usage.
     pool = Pool(processes=6, initializer=initialize_models)
     results = pool.map(process_article_wrapper, zip(article_links, article_labels))
     pool.close()
     pool.join()
 
+    # Separate successful and failed processing results. Store the
+    # successfully processed article segments, their corresponding target
+    # labels, and detected languages in separate lists, while storing
+    # failed articles in their own list.
     failed_data = [result for result in results if result[0] == "Fail"]
     X_final_data = [result[2][0] for result in results if result[0] == "Success"]
     y_final_data = [result[2][1] for result in results if result[0] == "Success"]
     language_data = [result[2][2] for result in results if result[0] == "Success"]
+
+    # Print summary statistics about the preprocessing pipeline to verify
+    # that the dataset was processed successfully and to identify potential
+    # issues before training the model.
 
     print(f"Length of successful data: {len(X_final_data)}")
     print(f"Length of failed data: {len(failed_data)}")
@@ -81,10 +93,6 @@ def main():
     print(f"Translation failed: {len([failure for failure in failed_data if failure[1] == 'Translation failed'])}")
     print(f"Other reason: {len([failure for failure in failed_data if (failure[1] != 'HTTP request failed' and failure[1] != 'Text cleanup function got rid of everything' and failure[1] != 'Translation failed')])}")
     print("-----------------")
-
-    training_set = []
-    validating_set = []
-    testing_set = []
 
     new_final_data = list(zip(X_final_data, y_final_data))
     print(f"Embeddings with invalid shape: {len([individual_article for individual_article in new_final_data if individual_article[0].shape != (768,)])}")
@@ -100,8 +108,17 @@ def main():
     print(f"Number of non-English articles: {len([statistic for statistic in language_data if statistic != 'eng'])}")
     print("-----------------")
 
+    # Split the processed dataset into training, validation, and testing
+    # datasets for model development and evaluation.
+
+    training_set = []
+    validating_set = []
+    testing_set = []
+
     contains_fake_article = False
     while contains_fake_article == False:
+        # If a previous split did not give every dataset at least one real
+        # article and one fake article, reshuffle the data and try again.
         random.shuffle(new_final_data)
 
         training_count = int(0.7 * len(new_final_data))
@@ -118,6 +135,8 @@ def main():
         testing_set_contains_fake = False
         testing_set_contains_real = False
 
+        # Verify that each dataset contains at least one real article and one
+        # fake article so every stage of model development uses both classes.
         for article_tuple in training_set:
             if article_tuple[1] == 0:
                 training_set_contains_fake = True
@@ -143,15 +162,26 @@ def main():
         testing_set_contains_fake = False
         testing_set_contains_real = False
 
+    # Save the processed training, validation, and testing datasets as NumPy files so
+    # the processed data can be loaded later without rerunning the preprocessing
+    # pipeline.
+
+    # Create the path to the clean data directory relative to the project
+    # location so the output files are saved consistently regardless of
+    # where the script is run from.
     CURRENT_LOCATION = os.path.dirname(os.path.abspath(__file__))
     PROJECT_ROOT = os.path.abspath(os.path.join(CURRENT_LOCATION, "..", ".."))
     DATA_LOCATION = os.path.join(PROJECT_ROOT, "data", "clean")
     os.makedirs(DATA_LOCATION, exist_ok=True)
 
+    # Convert the datasets into NumPy object arrays so the article
+    # embeddings and their labels can be saved together.
     training_set = np.array(training_set, dtype=object)
     validating_set = np.array(validating_set, dtype=object)
     testing_set = np.array(testing_set, dtype=object)
 
+    # Save each dataset as a NumPy file so it can be loaded directly during
+    # model training and evaluation.
     np.save(os.path.join(DATA_LOCATION, "training_dataset.npy"), training_set, allow_pickle=True)
     np.save(os.path.join(DATA_LOCATION, "validating_dataset.npy"), validating_set, allow_pickle=True)
     np.save(os.path.join(DATA_LOCATION, "testing_dataset.npy"), testing_set, allow_pickle=True)
@@ -174,6 +204,9 @@ def initialize_models():
     Returns:
         None
     """
+
+    # Initialize the models once before processing articles to avoid repeatedly
+    # loading large models and slowing down the pipeline.
 
     global language_model
     global detection_model

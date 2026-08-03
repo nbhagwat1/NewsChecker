@@ -29,6 +29,8 @@ def main():
         None
     """
 
+    # Preparing the model and the three datasets for evaluation
+
     logistic_model = joblib.load("logistic_model.pkl")
 
     train_dataset, validate_dataset, test_dataset = load_datasets()
@@ -41,7 +43,11 @@ def main():
     X_validate_dataset = X_validate_dataset.astype(np.float32)
     X_test_dataset = X_test_dataset.astype(np.float32)
 
+    # Printing statistics about each of the three datasets
+
     print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset)
+
+    # Printing metrics of the model
 
     y_train_prediction = logistic_model.predict(X_train_dataset)
     train_score = accuracy_score(y_train_prediction, y_train_dataset)

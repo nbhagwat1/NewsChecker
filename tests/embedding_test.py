@@ -1,6 +1,6 @@
 from backend.preprocessing.text_extraction import get_content, create_embeddings, segment_text_and_detect_language
 
-def test_sentence_formation(list):
+def print_paragraphs_chronologically(list):
     """
     Prints each of the strings in the list in chronological order.
 
@@ -22,7 +22,7 @@ def test_sentence_formation(list):
         print(f"Sentence {i + 1}: {text}")
         i += 1
 
-def test_embedding_generation():
+def examine_embedding_generation():
     """
     Prints a very long string, the same string when split into segments that are up to 300 words long, an embedding 
     that captures the meaning of the very long string, and important information about the embedding.
@@ -44,7 +44,7 @@ def test_embedding_generation():
         "I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava.", "SMG4 was an amazing YouTuber. Every day, he would make me laugh. His departure is something that no one would have ever expected. He will be missed."
     ]
     
-    x = test_text_segmentation_and_language_detection(sample_list)
+    x = examine_text_segmentation_and_language_detection(sample_list)
     print(f"Sample list: {sample_list}\n")
     for i, j in enumerate(x):
         print(f"Index {i}: {j}")
@@ -55,40 +55,11 @@ def test_embedding_generation():
     print("\n")
     print(f"Dictionary: {z}\n")
 
-def test_text_segmentation_and_language_detection(paragraph_list):
-    """
-    Returns the result of the parameter being inputted into another method.
-
-    This method takes the list of paragraphs that was inputted and inputs it into another method
-    that transforms it into a list of segments that are up to 300 words and make up the exact same
-    text.
-
-    Args:
-        paragraph_list (list[str]): The list of paragraphs that make up the main article content.
-    
-    Returns:
-        list[str]: A list of segments up to 300 words that make up the main article content.
-    """
-
+def examine_text_segmentation_and_language_detection(paragraph_list):
     segment_list, language = segment_text_and_detect_language(paragraph_list)
     return segment_list
 
-def get_embeddings(list):
-    """
-    Converts the list of text segments into a singular embedding and prints the
-    embedding.
-
-    This method takes the list of text segments that make up the main article text,
-    converts it into a singular embedding that captures the overall meaning of the
-    article, and prints the embedding.
-
-    Args:
-        list (list[str]): The list of text segments that make up the main article text.
-    
-    Returns:
-        None
-    """
-
+def create_and_print_embeddings(list):
     embeddings, b = create_embeddings(list)
     print(b)
 

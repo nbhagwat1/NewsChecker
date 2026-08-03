@@ -1,0 +1,1 @@
+This directory contains manual testing scripts used during development. These scripts print results for manual inspection and were used to verify preprocessing, embedding generation, and model predictions. Automated unit tests have not yet been implemented.
