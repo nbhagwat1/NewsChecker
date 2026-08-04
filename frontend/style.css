@@ -17,6 +17,7 @@ body {
     margin-bottom: 4px;
 }
 
+/* Allows the input area to expand naturally as users enter longer articles. */
 .article-text-input {
     min-height: 10lh;
     field-sizing: content;
