@@ -14,20 +14,22 @@ import gc
 
 def examine_link(link):
     """
-    Checks if the specified parameter is a valid link.
+    Validates that a provided string follows a basic URL format.
 
-    This method checks if the specified parameter contains exactly
-    one '.' character and no empty spaces. If the specified parameter
-    does, then it is a valid link, and the method does nothing. 
-    Otherwise, the specified parameter is not a valid link, and the
-    running program terminates.
+    This function checks that the input contains at least one period
+    character and does not contain whitespace. If the input does not
+    meet these conditions, the program exits.
 
     Args:
-        link (str): The link that will be checked for validity
+        link (str): The string to validate as a URL.
 
     Returns:
         None
+    
+    Raises:
+        SystemExit: If the input does not meet the basic URL requirements.    
     """
+
     link = link.strip().lower()
 
     # Perform a lightweight URL check. Requiring at least one dot and no spaces
@@ -46,23 +48,30 @@ def examine_link(link):
 
 def get_content(link):
     """
-    Extracts the main text content from a news article URL.
+    Extracts and cleans the main article content from a news webpage.
 
-    Retrieves the webpage HTML through an HTTP request, uses BeautifulSoup
-    to process the page structure, and removes unnecessary content such as
-    scripts, navigation menus, and advertisements to extract the main article text.
+    This function retrieves the HTML content of a news article URL,
+    processes the webpage structure using BeautifulSoup, removes
+    irrelevant elements such as advertisements and navigation content,
+    and extracts the main article text. It also extracts the article
+    title and preserves removed webpage information that may be useful
+    for future credibility analysis.
+
+    The function automatically handles missing URLs, unsupported webpages,
+    failed HTTP requests, and webpages where usable article text cannot
+    be extracted.
 
     Args:
-        link (str): The URL of the news article whose main content will be extracted.
+        link (str): URL of the news article to scrape and process.
     
     Returns:
-        str: The main article text of the news article that the URL leads to.
-        str: The title of the news article that the URL leads to.
-        list[str]: List of text segments that together make up the main article content.
-        dict: Information removed from the main article content that may still be useful
-        for assessing the article's trustworthiness.
-        str: An error message that explains why the method failed to extract the main
-        text content from the inputted news article URL (if necessary).
+        str: Cleaned article text extracted from the webpage.
+        str: Title of the news article.
+        list[str]: List of extracted article sections in their original document order.
+        dict: Additional webpage information removed during extraction, including metadata, 
+            source information, and other potentially useful text.
+        str: Error message describing why extraction failed, or None if extraction was
+            successful.
     """
 
     # Skip entries with missing URLs. Missing values may appear as either
@@ -453,20 +462,26 @@ def get_content(link):
 
 def segment_text_and_detect_language(segment_list, detection_model):
     """
-    Combines the extracted article text into segments of up to 300 words and detects the 
-    language of the article.
+    Splits article text into smaller segments and detects the article language.
 
-    The input text segments are combined in their original order into segments of up to 
-    300 words, which are stored in a list. The method also detects the article's language.
+    This function combines and divides extracted article content into segments
+    of up to 300 words while preserving sentence boundaries. The segmentation
+    keeps text inputs within the size limitations of the embedding model.
+    The function also uses a language detection model to identify the language
+    of the article.
 
     Args:
-        segment_list (list[str]): List of text segments that together make up the main article content.
-        detection_model: Loaded fastText language detection model.
+        segment_list (list[str]): List of text segments that together make up
+            the extracted article content.
+        detection_model: Loaded fastText language detection model used to
+            identify the article language.
 
     Returns:
-        list[str]: List of text segments of up to 300 words that together make up the main article content.
-        str: Error message that explains why the method failed to execute (if necessary)
-        str: The language of the article text
+        list[str]: List of article text segments, each containing up to
+            300 words.
+        str: Error message describing why processing failed, or None if 
+            the function completed successfully.
+        str: Three-letter language code detected from the article text.
     """
     
     # Download the resources required by NLTK's sentence tokenizer.
@@ -528,20 +543,30 @@ def segment_text_and_detect_language(segment_list, detection_model):
 
 def create_embeddings(segment_list, embedding_model):
     """
-    Generates a semantic embedding for an article and checks for suspicious characteristics.
+    Generates an article embedding and evaluates embedding quality.
 
-    The method uses the inputted embedding model to encode the inputted list of segments into high-dimensional 
-    semantic embeddings. These embeddings are then averaged to create a single embedding for the entire article. 
-    Finally, the method checks the generated embedding for potential quality issues, such as insufficient content, 
-    invalid values, unusual segment lengths, or low variation.
+    This function converts article text segments into semantic embeddings
+    using a SentenceTransformer model. For extremely large articles, the
+    number of segments is reduced using sampling to limit processing time.
+    The generated segment embeddings are averaged to create a single
+    fixed-length representation of the article.
+
+    The function also performs quality checks on the generated embeddings
+    and extracted article content, including checks for insufficient
+    content, failed embedding generation, unusual segment lengths, and
+    low embedding variation.
 
     Args:
-        segment_list (list[str]): List of text segments that together make up the main article content.
-        embedding_model: SentenceTransformer model used to generate semantic embeddings.
-    
+        segment_list (list[str]): List of article text segments used to
+            generate embeddings.
+        embedding_model: SentenceTransformer model used to convert text
+            segments into semantic embeddings.
+
     Returns:
-        np.ndarray: A fixed-length embedding that captures the meaning of the entire article.
-        dict: A dictionary that contains details about the suspicious characteristics of the embedding.
+        np.ndarray: A fixed-length embedding representing the overall
+            semantic content of the article.
+        dict: Dictionary containing flags indicating potential quality
+            issues detected during embedding generation.
     """
     
     initial_list = segment_list

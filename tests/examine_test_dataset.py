@@ -4,24 +4,22 @@ import numpy as np
 
 def main():
     """
-    Prints information related to how many times the trained machine
-    learning model predicts a certain binary truthfulness label for
-    all the embeddings in the testing dataset in comparison to how
-    many times that particular binary truthfulness label is present
-    in the testing dataset.
+    Compares the distribution of predicted and actual class labels.
 
-    This method loads the trained logistic regression model and the
-    testing dataset, splits the testing dataset into the embeddings
-    and their actual binary truthfulness labels (0 = fake news, 1 = 
-    real news), has the trained model predict the binary truthfulness 
-    label of each embedding, and compares the total number of times 
-    that each binary truthfulness label was predicted by the trained 
-    model to the total number of times that each binary truthfulness 
-    label is actually present in the testing dataset.
+    This function loads the trained logistic regression model and the
+    testing dataset, generates predictions for the testing dataset, and
+    prints the number of articles predicted for each binary truthfulness
+    label alongside the number of articles that actually belong to each
+    label.
+
+    The function also identifies the most frequently predicted class and
+    reports the proportion of testing samples assigned to that class.
+    These statistics help identify prediction bias or class imbalance in
+    the model's output.
 
     Args:
         None
-    
+
     Returns:
         None
     """

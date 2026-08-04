@@ -3,14 +3,16 @@ import os
 
 def main():
     """
-    Prints relevant information about the training, validation, and testing datasets.
+    Prints information about the processed datasets.
 
-    This method loads the training, validation, and testing datasets from their respective
-    .npy files, and it prints information about each dataset's data type, shape, and contents.
-    
+    This function loads the training, validation, and testing datasets
+    from their respective .npy files and prints each dataset's data type,
+    shape, and first sample. This information can be used to verify that
+    the datasets were saved and loaded correctly.
+
     Args:
         None
-    
+
     Returns:
         None
     """

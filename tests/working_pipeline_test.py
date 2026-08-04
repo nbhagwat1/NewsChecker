@@ -4,17 +4,17 @@ from backend.preprocessing.text_extraction import get_content
 
 def main():
     """
-    Examines the results of the training pipeline successfully extracting the main
-    article content from many article URLs.
+    Samples successfully processed articles from the training pipeline.
 
-    This method finds 60 article URLs that the training pipeline can successfully
-    extract the main article content from. Once it successfully extracts the main
-    article content from those 60 article URLs, it prints the extracted article
-    content.
+    This function repeatedly selects random article URLs from the original
+    dataset until 60 articles have been successfully processed by the
+    content extraction pipeline. It then prints the extracted article text
+    for each successful article, allowing the extraction results to be
+    inspected manually.
 
     Args:
         None
-    
+
     Returns:
         None
     """

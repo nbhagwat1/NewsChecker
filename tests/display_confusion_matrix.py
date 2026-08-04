@@ -5,22 +5,20 @@ from backend.model.train import load_datasets, unpack_dataset
 
 def main():
     """
-    Displays the confusion matrix that represents the trained machine
-    learning model's performance when predicting the binary truthfulness
-    label for the embeddings in the testing dataset.
+    Displays the confusion matrix for the trained logistic regression model.
 
-    This method loads the trained logistic regression model and the
-    testing dataset, has the model predict the binary truthfulness label
-    (0 = fake news, 1 = real news) for each embedding in the testing
-    dataset, and displays the confusion matrix that describes the trained
-    model's performance when it predicts the binary truthfulness label of
-    each embedding in the testing dataset and how that predicted label
-    compares to the actual binary truthfulness label of each embedding
-    in the testing dataset.
+    This function loads the trained logistic regression model and the
+    testing dataset, generates predictions for the testing dataset, and
+    displays a confusion matrix comparing the model's predicted binary
+    truthfulness labels with the ground-truth labels.
+
+    The confusion matrix provides a visual summary of the model's
+    classification performance by showing the numbers of true positives,
+    true negatives, false positives, and false negatives.
 
     Args:
         None
-    
+
     Returns:
         None
     """

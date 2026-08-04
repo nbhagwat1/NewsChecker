@@ -2,14 +2,15 @@ from backend.preprocessing.text_extraction import get_content, create_embeddings
 
 def main():
     """
-    Checks the validity of each of the links in the list.
+    Tests the link validation function using a collection of sample URLs.
 
-    This method iterates through each string in the list and
-    prints out whether or not each string is a valid link.
+    This function iterates through a predefined set of news article URLs,
+    validates each URL by calling the link validation function, and prints
+    a progress message after each successful validation.
 
     Args:
         None
-    
+
     Returns:
         None
     """

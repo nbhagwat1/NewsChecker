@@ -1,41 +1,42 @@
 from backend.preprocessing.text_extraction import get_content, create_embeddings, segment_text_and_detect_language
 
-def print_paragraphs_chronologically(list):
+def print_segments_chronologically(segments):
     """
-    Prints each of the strings in the list in chronological order.
+    Prints each text segment in the order it appears in the list.
 
-    The parameter represents a list of paragraphs in the order that they occur in the main content of
-    an article. This method simply prints each paragraph in the list in chronological order, doing so
-    in a structured format.
+    This function iterates through the input list of text segments and
+    prints each segment together with its position in the list. It is
+    primarily intended as a debugging utility for inspecting article
+    content after preprocessing.
 
     Args:
-        list (list[str]): A list of strings, with each string being a paragraph in the main content of
-        an article.
-    
+        segments (list[str]): A list of text segments in the order they
+            appear in the article.
+
     Returns:
         None
     """
 
     i = 0
-    print("List of paragraphs:")
-    for text in list:
-        print(f"Sentence {i + 1}: {text}")
+    print("List of segments:")
+    for text in segments:
+        print(f"Segment {i + 1}: {text}")
         i += 1
 
 def examine_embedding_generation():
     """
-    Prints a very long string, the same string when split into segments that are up to 300 words long, an embedding 
-    that captures the meaning of the very long string, and important information about the embedding.
+    Demonstrates the text segmentation and embedding generation pipeline.
 
-    This method takes a very long string that is over 300 words long and splits it into segments that are up to 300
-    words long, adding all of those segments to a list. The method then prints each of these segments in the order
-    that they occur in the original string. Then, the method converts the list of segments to a singular embedding
-    that captures the meaning of the original string. Finally, the method prints this singular embedding as well as
-    a dictionary that reveals important statistics about the embedding.
+    This function creates sample article text, splits it into segments of
+    up to 300 words, prints the resulting segments, generates a semantic
+    embedding for the article, and prints both the embedding and the
+    embedding quality information. It is intended as a debugging utility
+    for verifying that text segmentation and embedding generation behave
+    as expected.
 
     Args:
         None
-    
+
     Returns:
         None
     """
@@ -56,22 +57,61 @@ def examine_embedding_generation():
     print(f"Dictionary: {z}\n")
 
 def examine_text_segmentation_and_language_detection(paragraph_list):
-    segment_list, language = segment_text_and_detect_language(paragraph_list)
-    return segment_list
+    """
+    Segments article text and detects its language.
 
-def create_and_print_embeddings(list):
-    embeddings, b = create_embeddings(list)
+    This function processes a list of article paragraphs by splitting the
+    text into segments of up to 300 words and detecting the language of the
+    article content. It returns both the generated text segments and the
+    detected language.
+
+    Args:
+        paragraph_list (list[str]): A list of article paragraphs to be
+            segmented and analyzed.
+
+    Returns:
+        list[str]: A list of text segments containing the article content,
+            with each segment limited to approximately 300 words.
+        str: The detected language code of the article text.
+    """
+
+    segment_list, language = segment_text_and_detect_language(paragraph_list)
+    return segment_list, language
+
+def create_and_print_embeddings(segment_list):
+    """
+    Tests and displays the article embedding generation process.
+
+    This function takes a list of article text segments, generates a single
+    semantic embedding that represents the article content, and prints the
+    generated embedding along with a dictionary containing checks for
+    suspicious embedding characteristics, such as insufficient content,
+    invalid values, unusual segment lengths, or low variation.
+
+    Args:
+        segment_list (list[str]): A list of text segments that together make
+            up the article content.
+
+    Returns:
+        None
+    """
+
+    embeddings, b = create_embeddings(segment_list)
+    print(embeddings)
     print(b)
 
 def main():
     """
-    Tests the main article content extraction method on a random article URL.
+    Tests the article content extraction pipeline on a sample article URL.
 
-    This method takes an article URL and extracts and prints its main article content.
+    This function passes a predefined article URL to the content extraction
+    pipeline and prints the extracted main article content. It is intended
+    as a debugging utility for verifying that article extraction works
+    correctly.
 
     Args:
         None
-    
+
     Returns:
         None
     """

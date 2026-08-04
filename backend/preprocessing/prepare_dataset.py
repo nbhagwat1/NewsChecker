@@ -17,30 +17,21 @@ iteration = 0
 
 def main():
     """
-    Runs the entire original dataset of article URLs through the training
-    pipeline to produce the new and cleaned dataset, prints information relevant
-    to the training pipeline's performance, splits the new and cleaned dataset
-    into training, validation, and testing datasets, and saves the training,
-    validation, and testing datasets as .npy files.
+    Processes the original article dataset through the ML preprocessing pipeline.
 
-    The method loads the .csv file that contains the original dataset and retrieves
-    the set of article URLs and their respective binary labels that signify their
-    truthfulness. The method then creates a pool of six worker processes that concurrently
-    process the article URLs and their respective binary truthfulness labels. Once the
-    entire original dataset has been processed, the method prints important information
-    related to the training pipeline's performance, such as how many article URLs it
-    successfully processed, how many article URLs it didn't successfully process, and
-    how many article URLs it didn't successfully process because of a certain reason.
-    After that, the method takes the article URLs that were successfully processed and
-    adds their resulting embeddings to one dataset and their respective binary
-    truthfulness labels to another dataset. Once that is done, the method pairs each
-    embedding with its respective binary truthfulness label and creates a new dataset
-    consisting of those pairs using the built-in zip() function. The method then splits 
-    that dataset into a training dataset, a validation dataset, and a testing dataset
-    using a 70/15/15 split, ensuring that each dataset contains at least one embedding
-    that captures the meaning of a fake news article. Finally, the method saves each of
-    the three datasets (the training dataset, the validation dataset, and the testing
-    dataset) as .npy files in the `data/clean` directory of the NewsChecker project.
+    This function loads the original news article dataset, extracts article
+    content from URLs, generates semantic embeddings, filters invalid results,
+    and creates cleaned datasets for model training and evaluation.
+
+    The preprocessing pipeline uses multiprocessing to process articles
+    concurrently. After processing, the resulting article embeddings and
+    labels are split into training, validation, and testing datasets using
+    a 70/15/15 split. Each dataset is verified to contain both real and fake
+    news examples before being saved as NumPy files for later model training.
+
+    The function also reports preprocessing statistics, including successful
+    and failed article extractions, embedding quality issues, and detected
+    article languages.
 
     Args:
         None
@@ -190,13 +181,12 @@ def main():
 
 def initialize_models():
     """
-    Initializes all of the models that the pipeline needs to
-    process the articles in the original dataset.
+    Initializes the machine learning models required by the pipeline.
 
-    This method loads and initializes the models that the
-    pipeline uses to detect the article's text's language
-    and generate an embedding that captures the meaning of
-    the article.
+    This function loads the language detection model and the sentence
+    embedding model used during article processing. The models are initialized
+    once and stored globally so they can be reused across multiple article
+    processing tasks without repeatedly loading large model files.
 
     Args:
         None
@@ -218,49 +208,54 @@ def initialize_models():
 
 def process_article_wrapper(article_tuple):
     """
-    Wrapper function used by multiprocessing workers.
+    Wrapper function that allows article processing with multiprocessing.
 
-    Calls the standard article processing function so that articles can be
-    processed concurrently using Pool.map().
+    This function unpacks an article URL and its corresponding label from
+    a tuple and passes them to the standard article processing function.
+    It is used with multiprocessing.Pool.map() because worker functions
+    require a single input argument.
 
     Args:
-        article_tuple (tuple[str, str]): A tuple that contains an article's URL and a binary label that
-        represents the article's truthfulness.
+        article_tuple (tuple[str, str]): Tuple containing an article URL
+            and its binary truthfulness label (0 = fake news, 1 = real 
+            news).
     
     Returns:
-        str: A string that states whether or not the training pipeline successfully processed the article URL.
-        str: A string that explains why the training pipeline failed to process the article URL (if necessary).
-        tuple[np.ndarray, int, str]: A tuple that contains the single embedding that captures the meaning of the
-        article, a binary label that represents the truthfulness of the article, and a string that states the
-        language of the article's text.
+        str: String indicating whether processing succeeded ("Success")
+            or failed ("Fail").
+        str: Error message explaining why processing failed, or None if
+            processing was successful.
+        tuple[np.ndarray, int, str] | str: Processing output returned by 
+            the article processing function, containing the article 
+            embedding, label, and detected language on success, or the 
+            failed article URL otherwise.
     """
 
     return process_article(article_tuple[0], article_tuple[1])
 
 def process_article(link, label):
     """
-    Runs the URL of an article through the training pipeline and returns
-    the finishing result along with the article's respective binary label
-    that represents its truthfulness.
+    Processes a single article URL through the training pipeline.
 
-    This method takes the inputted article URL, extracts its main article
-    content, divides this main article content into segments of up to 
-    300 words, detects the language of this main article content, and
-    generates a single embedding that captures the meaning of the article.
-    The method then returns this single embedding, a string that represents
-    the detected language of the article, and a binary number that represents
-    the truthfulness of the article (0 = fake news, 1 = real news).
+    This function runs an article through the preprocessing pipeline by
+    extracting its content, splitting the content into smaller segments,
+    detecting the article language, generating an embedding, and pairing the
+    embedding with the article's binary truthfulness label.
 
     Args:
-        link (str): The article's URL.
-        label (int): A binary label that represents the article's truthfulness.
+        link (str): URL of the article to process.
+        label (int): Binary label representing the article's truthfulness
+            (0 = fake news, 1 = real news).
     
     Returns:
-        str: A string that states whether or not the training pipeline successfully processed the article URL.
-        str: A string that explains why the training pipeline failed to process the article URL (if necessary).
-        tuple[np.ndarray, int, str]: A tuple that contains the single embedding that captures the meaning of the
-        article, a binary label that represents the truthfulness of the article, and a string that states the
-        language of the article's text.
+        str: Status indicating whether processing succeeded ("Success")
+            or failed ("Fail").
+        str: Error message explaining why processing failed, or None if
+            the pipeline completed successfully.
+        tuple[np.ndarray, int, str] | str: A tuple containing the article 
+            embedding, its binary truthfulness label, and detected language 
+            if processing succeeds. Otherwise, contains the URL of the 
+            article that failed processing.
     """
 
     global iteration

@@ -5,18 +5,23 @@ from sklearn.linear_model import LogisticRegression
 
 def load_datasets():
     """
-    Loads and returns the training, validation, and testing datasets.
+    Loads the processed training, validation, and testing datasets.
 
-    This method loads the training, validation, and testing datasets from their
-    respective .npy files and returns them.
+    This function loads the saved datasets from their respective .npy files
+    and returns them for use during model training, validation, and
+    evaluation.
 
     Args:
         None
-    
+
     Returns:
-        list[tuple[np.ndarray, int]]: The training dataset.
-        list[tuple[np.ndarray, int]]: The validation dataset.
-        list[tuple[np.ndarray, int]]: The testing dataset.
+        list[tuple[np.ndarray, int]]: The training dataset containing article
+            embeddings and their corresponding binary truthfulness labels.
+        list[tuple[np.ndarray, int]]: The validation dataset containing article
+            embeddings and their corresponding binary truthfulness labels.
+        list[tuple[np.ndarray, int]]: The testing dataset containing article
+            embeddings and their corresponding binary truthfulness labels.
+
     """
 
     # Create the path to the clean data directory relative to the project
@@ -38,23 +43,23 @@ def load_datasets():
 
 def unpack_dataset(dataset):
     """
-    Splits a dataset into two lists, with one list containing all of the
-    singular embeddings and the other list containing all of the binary
-    truthfulness labels.
+    Separates article embeddings and labels for model training.
 
-    This method accepts a list of tuples, where each tuple contains an
-    embedding and its respective binary truthfulness label. The method
-    puts all of the embeddings in one list and all of the binary
-    truthfulness labels in another list. In the end, the method returns
-    both of these lists. (Why is this splitting necessary?)
+    This function accepts a dataset containing article embeddings paired with
+    their corresponding binary truthfulness labels. It separates the
+    embeddings into a feature matrix and the labels into a target array so
+    they can be used independently by machine learning models.
 
     Args:
-        dataset (list[tuple[np.ndarray, int]]): A list of tuples, where each tuple contains an
-        embedding and its respective binary truthfulness label.
-    
+        dataset (list[tuple[np.ndarray, int]]): A list of tuples where each
+            tuple contains an article embedding and its corresponding binary
+            truthfulness label.
+
     Returns:
-        np.ndstack: A list of all of the singular embeddings in the inputted dataset.
-        np.ndarray: A list of all of the binary truthfulness labels in the inputted dataset.
+        np.ndarray: A 2D array containing the article embeddings, where each
+            row represents one article's features.
+        np.ndarray: A 1D array containing the binary truthfulness labels for
+            each article.
     """
 
     X_list = []
@@ -78,22 +83,20 @@ def unpack_dataset(dataset):
 
 def main():
     """
-    Trains a logistic regression model with the training dataset and
-    saves the trained model.
+    Trains and saves the logistic regression model.
 
-    This method loads the training, validation, and testing datasets. Then,
-    it takes the training dataset and splits it into two lists: a list containing
-    the dataset's singular embeddings and a list containing the embeddings'
-    respective binary truthfulness labels. After that, the method creates a new
-    logistic regression model and trains it using the training dataset, with the
-    model's input features being the dataset's singular embeddings and the model's
-    target labels being the embeddings' respective binary truthfulness labels.
-    Once the model has been trained, it is saved to a file so that it can be loaded
-    and used later without needing to be retrained.
+    This function loads the processed training dataset, separates the article
+    embeddings from their corresponding binary truthfulness labels, and trains
+    a logistic regression model using the training data. The trained model is
+    saved to a file so it can be loaded later for predictions without needing
+    to be retrained.
+
+    The model uses balanced class weights to account for differences in the
+    number of real and fake news examples in the training dataset.
 
     Args:
         None
-    
+
     Returns:
         None
     """
@@ -118,21 +121,31 @@ def main():
 
 def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
     """
-    Prints valuable statistics about the training dataset, the validation dataset, and the testing dataset.
+    Prints summary statistics for the training, validation, and testing datasets.
 
-    This method prints information about the training dataset, the validation dataset, and the testing dataset, printing
-    information about the number of real news articles in each dataset, the number of fake news articles in each dataset,
-    whether or not the singular embeddings in each dataset have the same shape, and whether or not the singular embeddings
-    in each dataset contain valid numerical values. (Check this last part)
+    This function reports statistics for the processed datasets, including
+    the number of real and fake news articles in each dataset, dataset
+    dimensions, whether all article embeddings have the expected shape, and
+    whether any embeddings contain invalid numerical values such as NaN or
+    infinity.
+
+    These statistics help verify that the datasets were prepared correctly
+    before training or evaluating the machine learning model.
 
     Args:
-        X_train_dataset (list[np.ndarray]): The list of all singular embeddings in the training dataset.
-        X_validate_dataset (list[np.ndarray]): The list of all singular embeddings in the validation dataset.
-        X_test_dataset (list[np.ndarray]): The list of all singular embeddings in the testing dataset.
-        y_train_dataset (list[int]): The list of all binary truthfulness labels in the training dataset.
-        y_validate_dataset (list[int]): The list of all binary truthfulness labels in the validation dataset.
-        y_test_dataset (list[int]): The list of all binary truthfulness labels in the testing dataset.
-    
+        X_train_dataset (np.ndarray): Feature matrix containing the training
+            article embeddings.
+        X_validate_dataset (np.ndarray): Feature matrix containing the
+            validation article embeddings.
+        X_test_dataset (np.ndarray): Feature matrix containing the testing
+            article embeddings.
+        y_train_dataset (np.ndarray): Binary truthfulness labels for the
+            training dataset.
+        y_validate_dataset (np.ndarray): Binary truthfulness labels for the
+            validation dataset.
+        y_test_dataset (np.ndarray): Binary truthfulness labels for the
+            testing dataset.
+
     Returns:
         None
     """
