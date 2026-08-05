@@ -65,9 +65,9 @@ def main():
     print(classification_report(y_test_dataset, y_test_prediction))
     print("")
 
-    auc = roc_auc_score(y_test_dataset, real_probability_dataset)
+    final_score = roc_auc_score(y_test_dataset, real_probability_dataset)
     print("ROC-AUC:")
-    print(auc)
+    print(final_score)
     print("")
 
 if __name__ == "__main__":

@@ -29,15 +29,15 @@ def main():
     while len(final_list) < 60:
         random_link = random.choice(article_links)
 
-        content, title, text_list, additional_information, reason = get_content(random_link)
+        content, _, _, _, _ = get_content(random_link)
         if not content is None:
             final_list.append(content)
             print(f"Articles processed: {len(final_list)}")
         
         article_links.remove(random_link)
     
-    for i, content in enumerate(final_list):
-        print(f"Article {i + 1}:")
+    for current_index, content in enumerate(final_list):
+        print(f"Article {current_index + 1}:")
         print(content)
         print(" ")
 

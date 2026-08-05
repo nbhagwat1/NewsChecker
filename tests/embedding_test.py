@@ -17,11 +17,11 @@ def print_segments_chronologically(segments):
         None
     """
 
-    i = 0
+    segment_index = 0
     print("List of segments:")
-    for text in segments:
-        print(f"Segment {i + 1}: {text}")
-        i += 1
+    for segment_text in segments:
+        print(f"Segment {segment_index + 1}: {segment_text}")
+        segment_index += 1
 
 def examine_embedding_generation():
     """
@@ -45,16 +45,16 @@ def examine_embedding_generation():
         "I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava.", "SMG4 was an amazing YouTuber. Every day, he would make me laugh. His departure is something that no one would have ever expected. He will be missed."
     ]
     
-    x = examine_text_segmentation_and_language_detection(sample_list)
+    segments = examine_text_segmentation_and_language_detection(sample_list)
     print(f"Sample list: {sample_list}\n")
-    for i, j in enumerate(x):
-        print(f"Index {i}: {j}")
+    for segment_index, segment in enumerate(segments):
+        print(f"Index {segment_index}: {segment}")
     print("\n")
-    y, z = create_embeddings(sample_list)
+    embeddings, suspicious_factors = create_embeddings(segments)
     print("Embeddings:")
-    print(y)
+    print(embeddings)
     print("\n")
-    print(f"Dictionary: {z}\n")
+    print(f"Dictionary: {suspicious_factors}\n")
 
 def examine_text_segmentation_and_language_detection(paragraph_list):
     """
@@ -96,9 +96,9 @@ def create_and_print_embeddings(segment_list):
         None
     """
 
-    embeddings, b = create_embeddings(segment_list)
+    embeddings, suspicious_factors = create_embeddings(segment_list)
     print(embeddings)
-    print(b)
+    print(suspicious_factors)
 
 def main():
     """
@@ -117,9 +117,9 @@ def main():
     """
 
     article_link = "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway"
-    text, list, f, g, h = get_content(article_link)
+    article_text, _, _, _, _ = get_content(article_link)
 
-    print(text)
+    print(article_text)
 
 if __name__ == "__main__":
     main()

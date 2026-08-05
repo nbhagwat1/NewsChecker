@@ -26,7 +26,7 @@ def main():
 
     logistic_model = joblib.load("logistic_model.pkl")
 
-    train_dataset, validate_dataset, test_dataset = load_datasets()
+    _, _, test_dataset = load_datasets()
     X_test_dataset, y_test_dataset = unpack_dataset(test_dataset)
 
     y_test_prediction = logistic_model.predict(X_test_dataset)

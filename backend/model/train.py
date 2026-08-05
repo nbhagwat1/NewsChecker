@@ -101,7 +101,7 @@ def main():
         None
     """
 
-    train_dataset, validate_dataset, test_dataset = load_datasets()
+    train_dataset, _, _ = load_datasets()
 
     X_train_dataset, y_train_dataset = unpack_dataset(train_dataset)
 
@@ -179,33 +179,33 @@ def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dat
     # Verify that every article embedding has the expected 768-dimensional
     # shape produced by the embedding model before model training.
 
-    a = all(x.shape == (768,) for x in X_train_dataset)
-    b = all(x.shape == (768,) for x in X_validate_dataset)
-    c = all(x.shape == (768,) for x in X_test_dataset)
-    print(f"Consistent shape in train: {a}")
-    print(f"Consistent shape in validate: {b}")
-    print(f"Consistent shape in test: {c}")
+    training_embeddings_are_consistent = all(embedding.shape == (768,) for embedding in X_train_dataset)
+    validation_embeddings_are_consistent = all(embedding.shape == (768,) for embedding in X_validate_dataset)
+    testing_embeddings_are_consistent = all(embedding.shape == (768,) for embedding in X_test_dataset)
+    print(f"Consistent shape in train: {training_embeddings_are_consistent}")
+    print(f"Consistent shape in validate: {validation_embeddings_are_consistent}")
+    print(f"Consistent shape in test: {testing_embeddings_are_consistent}")
     print("-"*30)
 
     # Check for invalid numerical values in the embeddings before model training.
 
     X_train = np.stack(X_train_dataset)
-    d = np.isnan(X_train).any()
-    e = np.isinf(X_train).any()
-    print(f"NaN in train: {d}")
-    print(f"Inf in train: {e}")
+    training_embeddings_contain_nan = np.isnan(X_train).any()
+    training_embeddings_contain_inf = np.isinf(X_train).any()
+    print(f"NaN in train: {training_embeddings_contain_nan}")
+    print(f"Inf in train: {training_embeddings_contain_inf}")
 
     X_validate = np.stack(X_validate_dataset)
-    f = np.isnan(X_validate).any()
-    g = np.isinf(X_validate).any()
-    print(f"NaN in validate: {f}")
-    print(f"Inf in validate: {g}")
+    validation_embeddings_contain_nan = np.isnan(X_validate).any()
+    validation_embeddings_contain_inf = np.isinf(X_validate).any()
+    print(f"NaN in validate: {validation_embeddings_contain_nan}")
+    print(f"Inf in validate: {validation_embeddings_contain_inf}")
 
     X_test = np.stack(X_test_dataset)
-    h = np.isnan(X_test).any()
-    j = np.isinf(X_test).any()
-    print(f"NaN in test: {h}")
-    print(f"Inf in test: {j}")
+    testing_embeddings_contain_nan = np.isnan(X_test).any()
+    testing_embeddings_contain_inf = np.isinf(X_test).any()
+    print(f"NaN in test: {testing_embeddings_contain_nan}")
+    print(f"Inf in test: {testing_embeddings_contain_inf}")
     print("-"*30)
 
 if __name__ == "__main__":

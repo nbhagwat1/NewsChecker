@@ -261,13 +261,13 @@ def process_article(link, label):
     global iteration
     print(f"Iteration {iteration} is beginning!")
     iteration += 1
-    content, title, text_list, additional_information, reason = get_content(link)
+    content, _, text_list, _, reason = get_content(link)
     if content is None:
         return "Fail", reason, link
     else:
-        translated_content, failed_reason, language = segment_text_and_detect_language(text_list, detection_model)
+        translated_content, _, language = segment_text_and_detect_language(text_list, detection_model)
 
-        average_embedding, flags = create_embeddings(translated_content, embedding_model)
+        average_embedding, _ = create_embeddings(translated_content, embedding_model)
 
         return "Success", None, (average_embedding, label, language)
 

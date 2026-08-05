@@ -98,11 +98,11 @@ def check(article: NewsArticle):
 
         # Prepare user-provided article text for inference by splitting it
         # into segments and detecting the language before embedding generation.
-        segments, placeholder, language = segment_text_and_detect_language(text_list, detection_model)
+        segments, _, _ = segment_text_and_detect_language(text_list, detection_model)
 
         # Convert processed article segments into fixed-size embeddings
         # used as input features for the classifier.
-        embeddings, suspicious_factors = create_embeddings(segments, embedding_model)
+        embeddings, _ = create_embeddings(segments, embedding_model)
 
         embedding_list = []
         embedding_list.append(embeddings)

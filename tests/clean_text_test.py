@@ -20,14 +20,14 @@ def main():
     link_list_three = ["https://news.yahoo.com/articles/two-brewing-snow-storms-puzzle-173201877.html", "https://www.yahoo.com/news/articles/east-tennessee-school-closures-delays-020404502.html", "https://www.yahoo.com/finance/news/mcdonalds-bets-ai-2026-fix-193300993.html", "https://www.yahoo.com/news/articles/snow-florida-arctic-blast-stun-164720507.html", "https://www.yahoo.com/news/articles/she-terrified-details-emerge-ohio-010134244.html"]
     currently_testing = ["https://www.yahoo.com/news/articles/east-tennessee-school-closures-delays-020404502.html"]
 
-    full_list = link_list + link_list_two + link_list_three
+    full_list = link_list + link_list_two + link_list_three + currently_testing
 
-    i = 1
+    current_index = 1
 
     for link in full_list:
         examine_link(link)
-        print(f"Link {i}: Successful")
-        i += 1
+        print(f"Link {current_index}: Successful")
+        current_index += 1
 
 if __name__ == "__main__":
     main()
