@@ -483,6 +483,9 @@ def segment_text_and_detect_language(segment_list, detection_model):
             the function completed successfully.
         str: Three-letter language code detected from the article text.
     """
+
+    if not segment_list:
+        raise ValueError("No valid text segments found")
     
     # Download the resources required by NLTK's sentence tokenizer.
     # These resources allow paragraphs to be split into individual sentences.
@@ -568,6 +571,9 @@ def create_embeddings(segment_list, embedding_model):
         dict: Dictionary containing flags indicating potential quality
             issues detected during embedding generation.
     """
+
+    if not segment_list:
+        raise ValueError("No valid text segments found")
     
     initial_list = segment_list
 
