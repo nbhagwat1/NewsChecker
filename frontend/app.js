@@ -42,6 +42,8 @@ async function checkArticle() {
             })
         });
 
+        // Treat unsuccessful HTTP responses as errors so they can be handled
+        // by the catch block and displayed to the user.
         if (!result.ok) {
             throw new Error("Server error");
         }
@@ -76,6 +78,8 @@ async function checkArticle() {
         displayElement.style.padding = "8px";
 
     } catch (error) {
+        // Display a user-friendly message when the backend request fails
+        // while keeping the interface available for another attempt.
         labelElement.textContent = "Unable to process article.";
         labelElement.style.color = "rgb(255, 0, 0)";
         scoreElement.textContent = "";

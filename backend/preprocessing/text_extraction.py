@@ -484,6 +484,7 @@ def segment_text_and_detect_language(segment_list, detection_model):
         str: Three-letter language code detected from the article text.
     """
 
+    # Prevent processing when no text segments are provided as input.
     if not segment_list:
         raise ValueError("No valid text segments found")
     
@@ -572,6 +573,7 @@ def create_embeddings(segment_list, embedding_model):
             issues detected during embedding generation.
     """
 
+    # Embeddings cannot be generated without at least one valid text segment.
     if not segment_list:
         raise ValueError("No valid text segments found")
     

@@ -47,8 +47,12 @@ async def lifespan(app: FastAPI):
 
     except Exception as e:
         print(f"Failed to load models: {e}")
+
+        # Stop application startup because the API cannot perform inference
+        # without the required ML models.
         raise
 
+    # Application runs while paused at this point. Cleanup code executes after shutdown.
     yield
 
     print("Shutting down")
@@ -112,6 +116,10 @@ def check(article: NewsArticle):
         }
     
     except Exception as e:
+        print(f"Failed to process article: {e}")
+
+        # Convert internal processing failures into an HTTP response
+        # so the frontend can display a user-friendly error message.
         raise HTTPException(
             status_code=500,
             detail="Unable to process article."
