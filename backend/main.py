@@ -32,7 +32,7 @@ async def lifespan(app: FastAPI):
 
     try: 
         print("Loading classifier...")
-        logistic_model = joblib.load("logistic_model.pkl")
+        logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
         print("Loading language detection model...")
         language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin") 
@@ -93,8 +93,7 @@ def check(article: NewsArticle):
     """
 
     try: 
-        text_list = []
-        text_list.append(article.text)
+        text_list = [article.text]
 
         # Prepare user-provided article text for inference by splitting it
         # into segments and detecting the language before embedding generation.

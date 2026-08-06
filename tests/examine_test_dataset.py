@@ -24,7 +24,7 @@ def main():
         None
     """
 
-    logistic_model = joblib.load("logistic_model.pkl")
+    logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
     _, _, test_dataset = load_datasets()
     X_test_dataset, y_test_dataset = unpack_dataset(test_dataset)

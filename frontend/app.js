@@ -50,7 +50,7 @@ async function checkArticle() {
 
         const resultData = await result.json();
 
-        scoreElement.textContent = "Score: " + resultData.score;
+        scoreElement.textContent = "Confidence Score: " + resultData.score;
 
         let label = "UNCERTAIN";
         const resultScore = resultData.score;

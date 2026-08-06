@@ -117,7 +117,7 @@ def main():
 
     # Save the trained model so it can be loaded later for predictions
     # without retraining.
-    joblib.dump(logistic_model, "logistic_model_v2.pkl")
+    joblib.dump(logistic_model, "logistic_model_v3.pkl")
 
 def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
     """

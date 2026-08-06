@@ -25,7 +25,7 @@ def main():
 
     # Preparing the model and the three datasets for evaluation
 
-    logistic_model = joblib.load("logistic_model.pkl")
+    logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
     train_dataset, validate_dataset, test_dataset = load_datasets()
 

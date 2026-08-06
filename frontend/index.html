@@ -6,15 +6,28 @@
     </head>
     <body>
         <h1>NewsChecker</h1>
+
         <p>Paste the article text in the following input boxes:</p>
+
         <div class="input-area">
             <p class="input-label">Article Text:</p> 
             <textarea class="article-text-input"></textarea>
         </div>
+
         <button class="submit-button" onclick="checkArticle()">Submit</button>
+
         <div class="result-display">
-            <p class="result-label"></p>
+            <p class="result-label">The results will be shown here.</p>
             <p class="result-score"></p>
+        </div>
+
+        <div class="confidence-guide">
+            <p class="section-title">How to Interpret the Confidence Score</p>
+            <p class="section-element">0.00 - 0.20: <span style="color: rgb(255, 0, 0);">LIKELY UNTRUSTWORTHY</span></p>
+            <p class="section-element">0.20 - 0.40: <span style="color: rgb(255, 111, 0);">PROBABLY UNTRUSTWORTHY</span></p>
+            <p class="section-element">0.40 - 0.60: <span style="color: rgb(212, 255, 0);">UNCERTAIN</span></p>
+            <p class="section-element">0.60 - 0.80: <span style="color: rgb(0, 255, 38);">PROBABLY TRUSTWORTHY</span></p>
+            <p class="section-element">0.80 - 1.00: <span style="color: rgb(0, 143, 21);">LIKELY TRUSTWORTHY</span></p>
         </div>
 
         <!-- Defer loading until HTML parsing is complete so DOM elements are available -->

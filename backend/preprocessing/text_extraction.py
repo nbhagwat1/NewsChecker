@@ -615,12 +615,6 @@ def create_embeddings(segment_list, embedding_model):
     # represents the article for model training.
     average_embedding = np.mean(embeddings, axis=0)
 
-    # Free memory before processing the next article to reduce memory usage
-    # during large-scale training.
-    del embeddings
-    del initial_list
-    gc.collect()
-
     # Perform quality checks on the generated embeddings to identify
     # potential problems with the extracted article content.
 
@@ -653,5 +647,11 @@ def create_embeddings(segment_list, embedding_model):
     # Check whether the embeddings vary very little across segments, which
     # may indicate that the extracted content lacks meaningful variation.
     suspicious_factors["low_variance"] = np.var(embeddings, axis=0).mean() <= 0.001
+
+    # Free memory before processing the next article to reduce memory usage
+    # during large-scale training.
+    del embeddings
+    del initial_list
+    gc.collect()
 
     return average_embedding, suspicious_factors

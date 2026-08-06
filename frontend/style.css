@@ -42,16 +42,35 @@ body {
 
 .result-display {
     background-color: black;
-    padding: 0px;
     margin-top: 5px;
-
+    margin-bottom: 21px;
+    padding: 5px;
 }
 
 .result-label {
     margin: 0px;
+    color: white;
 }
 
 .result-score {
     color: white;
+    margin-top: 0px;
     margin-bottom: 0px;
+}
+
+.confidence-guide {
+    background-color: black;
+    color: white;
+    padding: 5px;
+}
+
+.section-title {
+    margin-top: 0px;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.section-element {
+    margin: 0px;
 }
