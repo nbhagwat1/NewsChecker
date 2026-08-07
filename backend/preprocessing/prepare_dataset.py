@@ -5,8 +5,6 @@ import numpy as np
 import pandas as pd
 from backend.preprocessing.text_extraction import get_content, segment_text_and_detect_language, create_embeddings
 import random
-from huggingface_hub import hf_hub_download
-import fasttext
 from sentence_transformers import SentenceTransformer
 from multiprocessing import Pool
 
@@ -202,8 +200,8 @@ def initialize_models():
     global detection_model
     global embedding_model
     
-    language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin")
-    detection_model = fasttext.load_model(language_model)
+    language_model = None
+    detection_model = None
     embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
 def process_article_wrapper(article_tuple):

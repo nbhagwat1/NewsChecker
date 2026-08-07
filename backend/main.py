@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from huggingface_hub import hf_hub_download
-import fasttext
 from sentence_transformers import SentenceTransformer
 import joblib
 from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings

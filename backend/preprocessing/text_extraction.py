@@ -1,10 +1,6 @@
 import requests
 import re
 from bs4 import BeautifulSoup, Tag
-from sentence_transformers import SentenceTransformer
-from huggingface_hub import hf_hub_download
-from huggingface_hub.utils import HfHubHTTPError
-from transformers import pipeline
 import nltk
 from nltk.tokenize import sent_tokenize
 import numpy as np
