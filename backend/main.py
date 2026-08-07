@@ -33,10 +33,8 @@ async def lifespan(app: FastAPI):
         logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
         print("Loading language detection model...", flush=True)
-        language_model = None 
 
-        print("Loading other language detection model...", flush=True)
-        detection_model = None  
+        print("Loading other language detection model...", flush=True) 
 
         print("Loading embedding model...", flush=True)
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
@@ -95,7 +93,7 @@ def check(article: NewsArticle):
 
         # Prepare user-provided article text for inference by splitting it
         # into segments and detecting the language before embedding generation.
-        segments, _, _ = segment_text_and_detect_language(text_list, detection_model)
+        segments, _, _ = segment_text_and_detect_language(text_list, None)
 
         # Convert processed article segments into fixed-size embeddings
         # used as input features for the classifier.
