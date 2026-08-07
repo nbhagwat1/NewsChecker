@@ -31,19 +31,19 @@ async def lifespan(app: FastAPI):
     global embedding_model
 
     try: 
-        print("Loading classifier...")
+        print("Loading classifier...", flush=True)
         logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
-        print("Loading language detection model...")
+        print("Loading language detection model...", flush=True)
         language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin") 
 
-        print("Loading other language detection model...")
+        print("Loading other language detection model...", flush=True)
         detection_model = fasttext.load_model(language_model)  
 
-        print("Loading embedding model...")
+        print("Loading embedding model...", flush=True)
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
-        print("Models loaded successfully")
+        print("Models loaded successfully", flush=True)
 
     except Exception as e:
         print(f"Failed to load models: {e}")
