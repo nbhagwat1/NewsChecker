@@ -536,12 +536,15 @@ def segment_text_and_detect_language(segment_list, detection_model):
     # Detect the article's language using FastText on a single cleaned segment
     # instead of the entire article to reduce processing time while providing
     # enough text for language detection.
-    initial_list_copy = initial_list[:]
-    segment = initial_list[0]
-    segment_copy = initial_list_copy[0]
-    clean_segment = segment_copy.replace("\n", " ")
-    language_tuple = detection_model.predict(clean_segment)
-    language = language_tuple[0][0][9:12]
+
+    language = None
+    if detection_model:
+        initial_list_copy = initial_list[:]
+        segment = initial_list[0]
+        segment_copy = initial_list_copy[0]
+        clean_segment = segment_copy.replace("\n", " ")
+        language_tuple = detection_model.predict(clean_segment)
+        language = language_tuple[0][0][9:12]
 
     return initial_list, None, language
 

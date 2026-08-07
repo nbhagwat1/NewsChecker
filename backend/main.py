@@ -35,10 +35,10 @@ async def lifespan(app: FastAPI):
         logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
         print("Loading language detection model...", flush=True)
-        language_model = hf_hub_download(repo_id="facebook/fasttext-language-identification", filename="model.bin") 
+        language_model = None 
 
         print("Loading other language detection model...", flush=True)
-        detection_model = fasttext.load_model(language_model)  
+        detection_model = None  
 
         print("Loading embedding model...", flush=True)
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
