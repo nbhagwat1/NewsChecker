@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import joblib
-# from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
+from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
 from pydantic import BaseModel, Field
 import psutil
 import torch
@@ -32,17 +32,19 @@ async def lifespan(app: FastAPI):
     try: 
         process = psutil.Process()
 
-        print(
-            f"Current memory before classifier: "
-            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
-            flush=True
-        )
-
         print("Loading classifier...", flush=True)
         logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
         print(
-            f"Current memory after classifier: "
+            f"Current memory before import: "
+            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
+            flush=True
+        )
+
+        from sentence_transformers import SentenceTransformer
+
+        print(
+            f"Current memory after import: "
             f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
             flush=True
         )
@@ -54,8 +56,6 @@ async def lifespan(app: FastAPI):
         )
 
         print("Loading embedding model...", flush=True)
-
-        from sentence_transformers import SentenceTransformer
 
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2", model_kwargs={"torch_dtype": torch.float16})
 
