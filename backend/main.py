@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer
 import joblib
 from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
 from pydantic import BaseModel, Field
+import resource
 
 # Models are loaded during application startup instead of on every request
 # to avoid repeatedly loading large ML models during inference.
@@ -36,8 +37,20 @@ async def lifespan(app: FastAPI):
 
         print("Loading other language detection model...", flush=True) 
 
+        print(
+            f"Memory before embedding model: "
+            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            flush=True
+        )
+
         print("Loading embedding model...", flush=True)
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+
+        print(
+            f"Memory after embedding model: "
+            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            flush=True
+        )
 
         print("Models loaded successfully", flush=True)
 
