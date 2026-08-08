@@ -1,7 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from sentence_transformers import SentenceTransformer
 import joblib
 from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
 from pydantic import BaseModel, Field
@@ -52,6 +51,9 @@ async def lifespan(app: FastAPI):
         )
 
         print("Loading embedding model...", flush=True)
+
+        from sentence_transformers import SentenceTransformer
+
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
 
         print(
