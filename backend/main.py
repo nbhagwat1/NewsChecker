@@ -57,7 +57,10 @@ async def lifespan(app: FastAPI):
 
         print("Loading embedding model...", flush=True)
 
-        embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2", model_kwargs={"torch_dtype": torch.float16})
+        embedding_model = SentenceTransformer(
+            "sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={"torch_dtype": "float16"}
+        )
 
         print(
             f"Current memory after embedding model: "
