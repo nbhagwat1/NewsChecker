@@ -606,7 +606,7 @@ def create_embeddings(segment_list, embedding_model):
     # in batches of 64 to balance processing speed and memory usage.
     embeddings = embedding_model.encode(
         initial_list, 
-        batch_size=64, 
+        batch_size=8, 
         show_progress_bar=False
     )
 

@@ -5,6 +5,7 @@ import joblib
 from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
 from pydantic import BaseModel, Field
 import resource
+import torch
 
 # Models are loaded during application startup instead of on every request
 # to avoid repeatedly loading large ML models during inference.
@@ -54,7 +55,7 @@ async def lifespan(app: FastAPI):
 
         from sentence_transformers import SentenceTransformer
 
-        embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+        embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2", model_kwargs={"torch_dtype": torch.float16})
 
         print(
             f"Memory after embedding model: "
