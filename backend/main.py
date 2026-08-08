@@ -30,12 +30,20 @@ async def lifespan(app: FastAPI):
     global embedding_model
 
     try: 
+        print(
+            f"Memory before classifier: "
+            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            flush=True
+        )
+
         print("Loading classifier...", flush=True)
         logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
-        print("Loading language detection model...", flush=True)
-
-        print("Loading other language detection model...", flush=True) 
+        print(
+            f"Memory after classifier: "
+            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            flush=True
+        )
 
         print(
             f"Memory before embedding model: "
