@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import joblib
 from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
 from pydantic import BaseModel, Field
-import resource
+import psutil
 import torch
 
 # Models are loaded during application startup instead of on every request
@@ -30,9 +30,11 @@ async def lifespan(app: FastAPI):
     global embedding_model
 
     try: 
+        process = psutil.Process()
+
         print(
-            f"Memory before classifier: "
-            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            f"Current memory before classifier: "
+            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
             flush=True
         )
 
@@ -40,14 +42,14 @@ async def lifespan(app: FastAPI):
         logistic_model = joblib.load("models/logistic_model_v2.pkl")
 
         print(
-            f"Memory after classifier: "
-            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            f"Current memory after classifier: "
+            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
             flush=True
         )
 
         print(
-            f"Memory before embedding model: "
-            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            f"Current memory before embedding model: "
+            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
             flush=True
         )
 
@@ -58,8 +60,8 @@ async def lifespan(app: FastAPI):
         embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2", model_kwargs={"torch_dtype": torch.float16})
 
         print(
-            f"Memory after embedding model: "
-            f"{resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024:.2f} MB",
+            f"Current memory after embedding model: "
+            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
             flush=True
         )
 
