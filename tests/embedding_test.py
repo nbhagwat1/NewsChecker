@@ -1,4 +1,6 @@
-from backend.preprocessing.text_extraction import get_content, create_embeddings, segment_text_and_detect_language
+from backend.preprocessing.text_extraction import get_content, create_embedding, segment_text_and_detect_language
+from transformers import AutoTokenizer, AutoModel
+import torch
 
 def print_segments_chronologically(segments):
     """
@@ -44,17 +46,26 @@ def examine_embedding_generation():
     sample_list = [
         "I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava. I love yogurt. Yogurt is my favorite thing ever. If I didn't love yogurt, I don't know what else I would love. Oh, yeah, I really love broccoli. Broccoli is so nice as a food and as a vegetable. I love video games. In Mario Party 9, my favorite game is Toad Road. There are no unfair twists that make you lose half of your mini stars. Unlike in Boo's Horror Castle, which has like 8 boos, all of which will make you lose half of your mini stars. And also in Magma Mine, where you could lose your mini stars as many times as possible because you could hit the lava.", "SMG4 was an amazing YouTuber. Every day, he would make me laugh. His departure is something that no one would have ever expected. He will be missed."
     ]
+
+    MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+    
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+    model = AutoModel.from_pretrained(
+        MODEL_NAME,
+        dtype=torch.float16
+    )
+
+    model.eval()
     
     segments = examine_text_segmentation_and_language_detection(sample_list)
     print(f"Sample list: {sample_list}\n")
     for segment_index, segment in enumerate(segments):
         print(f"Index {segment_index}: {segment}")
     print("\n")
-    embeddings, suspicious_factors = create_embeddings(segments)
+    embeddings = create_embedding(segments, tokenizer, model)
     print("Embeddings:")
     print(embeddings)
-    print("\n")
-    print(f"Dictionary: {suspicious_factors}\n")
 
 def examine_text_segmentation_and_language_detection(paragraph_list):
     """
@@ -75,8 +86,8 @@ def examine_text_segmentation_and_language_detection(paragraph_list):
         str: The detected language code of the article text.
     """
 
-    segment_list, language = segment_text_and_detect_language(paragraph_list)
-    return segment_list, language
+    segment_list, _, _ = segment_text_and_detect_language(paragraph_list, None)
+    return segment_list
 
 def create_and_print_embeddings(segment_list):
     """
@@ -96,7 +107,7 @@ def create_and_print_embeddings(segment_list):
         None
     """
 
-    embeddings, suspicious_factors = create_embeddings(segment_list)
+    embeddings, suspicious_factors = create_embedding(segment_list)
     print(embeddings)
     print(suspicious_factors)
 
@@ -116,10 +127,14 @@ def main():
         None
     """
 
+    '''
     article_link = "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway"
     article_text, _, _, _, _ = get_content(article_link)
 
     print(article_text)
+    '''
+
+    examine_embedding_generation()
 
 if __name__ == "__main__":
     main()

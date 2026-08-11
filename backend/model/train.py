@@ -30,9 +30,9 @@ def load_datasets():
     DATA_LOCATION = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "clean")
 
     # Create file paths for each saved dataset.
-    train_file = os.path.join(DATA_LOCATION, "training_dataset.npy")
-    validate_file = os.path.join(DATA_LOCATION, "validating_dataset.npy")
-    test_file = os.path.join(DATA_LOCATION, "testing_dataset.npy")
+    train_file = os.path.join(DATA_LOCATION, "new_training_dataset.npy")
+    validate_file = os.path.join(DATA_LOCATION, "new_validating_dataset.npy")
+    test_file = os.path.join(DATA_LOCATION, "new_testing_dataset.npy")
 
     # Load the saved datasets from NumPy files.
     train_dataset = np.load(train_file, allow_pickle=True)
@@ -117,7 +117,7 @@ def main():
 
     # Save the trained model so it can be loaded later for predictions
     # without retraining.
-    joblib.dump(logistic_model, "logistic_model_v3.pkl")
+    joblib.dump(logistic_model, "logistic_model_v4.pkl")
 
 def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dataset, y_validate_dataset, y_test_dataset):
     """
@@ -179,9 +179,9 @@ def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dat
     # Verify that every article embedding has the expected 768-dimensional
     # shape produced by the embedding model before model training.
 
-    training_embeddings_are_consistent = all(embedding.shape == (768,) for embedding in X_train_dataset)
-    validation_embeddings_are_consistent = all(embedding.shape == (768,) for embedding in X_validate_dataset)
-    testing_embeddings_are_consistent = all(embedding.shape == (768,) for embedding in X_test_dataset)
+    training_embeddings_are_consistent = all(embedding.shape == (384,) for embedding in X_train_dataset)
+    validation_embeddings_are_consistent = all(embedding.shape == (384,) for embedding in X_validate_dataset)
+    testing_embeddings_are_consistent = all(embedding.shape == (384,) for embedding in X_test_dataset)
     print(f"Consistent shape in train: {training_embeddings_are_consistent}")
     print(f"Consistent shape in validate: {validation_embeddings_are_consistent}")
     print(f"Consistent shape in test: {testing_embeddings_are_consistent}")

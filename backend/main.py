@@ -2,16 +2,15 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import joblib
-from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embeddings
+from backend.preprocessing.text_extraction import segment_text_and_detect_language, create_embedding
 from pydantic import BaseModel, Field
-import psutil
+from transformers import AutoTokenizer, AutoModel
 import torch
 
 # Models are loaded during application startup instead of on every request
 # to avoid repeatedly loading large ML models during inference.
 logistic_model = None
-language_model = None
-detection_model = None
+tokenizer = None
 embedding_model = None
 
 @asynccontextmanager
@@ -25,48 +24,25 @@ async def lifespan(app: FastAPI):
     # so prediction requests can run without initialization overhead.
 
     global logistic_model
-    global language_model
-    global detection_model
+    global tokenizer
     global embedding_model
 
     try: 
-        process = psutil.Process()
-
         print("Loading classifier...", flush=True)
-        logistic_model = joblib.load("models/logistic_model_v2.pkl")
-
-        print(
-            f"Current memory before import: "
-            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
-            flush=True
-        )
-
-        from sentence_transformers import SentenceTransformer
-
-        print(
-            f"Current memory after import: "
-            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
-            flush=True
-        )
-
-        print(
-            f"Current memory before embedding model: "
-            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
-            flush=True
-        )
+        logistic_model = joblib.load("models/logistic_model_v3.pkl")
 
         print("Loading embedding model...", flush=True)
 
-        embedding_model = SentenceTransformer(
-            "sentence-transformers/all-MiniLM-L6-v2",
-            model_kwargs={"torch_dtype": "float16"}
+        MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+
+        tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+        embedding_model = AutoModel.from_pretrained(
+            MODEL_NAME,
+            dtype=torch.float16
         )
 
-        print(
-            f"Current memory after embedding model: "
-            f"Current memory: {process.memory_info().rss / 1024 / 1024:.2f} MB",
-            flush=True
-        )
+        embedding_model.eval()
 
         print("Models loaded successfully", flush=True)
 
@@ -126,10 +102,10 @@ def check(article: NewsArticle):
 
         # Convert processed article segments into fixed-size embeddings
         # used as input features for the classifier.
-        embeddings, _ = create_embeddings(segments, embedding_model)
+        average_embedding = create_embedding(segments, tokenizer, embedding_model)
 
         embedding_list = []
-        embedding_list.append(embeddings)
+        embedding_list.append(average_embedding)
 
         prediction = logistic_model.predict(embedding_list)
         score = logistic_model.predict_proba(embedding_list)[:, 1][0]

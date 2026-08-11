@@ -7,6 +7,7 @@ import numpy as np
 import math
 import time
 import gc
+import torch
 
 def examine_link(link):
     """
@@ -506,7 +507,7 @@ def segment_text_and_detect_language(segment_list, detection_model):
 
         # Split article text into segments of up to 300 words to keep each
         # segment within the input size limitations of the embedding model.
-        if word_count < 300:
+        if word_count < 150:
             initial_list.append(paragraph)
         else:
             # Split the paragraph into sentences so segments can be created without
@@ -517,7 +518,7 @@ def segment_text_and_detect_language(segment_list, detection_model):
             paragraph_words = 0
             for i, sentence in enumerate(sentences):
                 paragraph_words += len(sentence.split())
-                if (paragraph_words < 300):
+                if (paragraph_words < 150):
                     new_paragraph += (sentence + " ")
                     if i == len(sentences) - 1:
                         initial_list.append(new_paragraph.strip())
@@ -544,113 +545,83 @@ def segment_text_and_detect_language(segment_list, detection_model):
 
     return initial_list, None, language
 
-def create_embeddings(segment_list, embedding_model):
-    """
-    Generates an article embedding and evaluates embedding quality.
-
-    This function converts article text segments into semantic embeddings
-    using a SentenceTransformer model. For extremely large articles, the
-    number of segments is reduced using sampling to limit processing time.
-    The generated segment embeddings are averaged to create a single
-    fixed-length representation of the article.
-
-    The function also performs quality checks on the generated embeddings
-    and extracted article content, including checks for insufficient
-    content, failed embedding generation, unusual segment lengths, and
-    low embedding variation.
-
-    Args:
-        segment_list (list[str]): List of article text segments used to
-            generate embeddings.
-        embedding_model: SentenceTransformer model used to convert text
-            segments into semantic embeddings.
-
-    Returns:
-        np.ndarray: A fixed-length embedding representing the overall
-            semantic content of the article.
-        dict: Dictionary containing flags indicating potential quality
-            issues detected during embedding generation.
-    """
-
+def create_embedding(segment_list, tokenizer, embedding_model):
     # Embeddings cannot be generated without at least one valid text segment.
     if not segment_list:
         raise ValueError("No valid text segments found")
     
-    initial_list = segment_list
-
-    # If the article contains more than 2000 segments, reduce the number of
+    # If the article contains more than 4000 segments, reduce the number of
     # segments before generating embeddings. A stride-based sampling approach
-    # is used to evenly select 2000 segments from the original list while
+    # is used to evenly select 4000 segments from the original list while
     # preserving coverage of the article's content.
-    segment_count = len(initial_list)
-    if segment_count > 2000:
+    segment_count = len(segment_list)
+    if segment_count > 4000:
         sampled_segments = []
 
-        # Calculate the interval between selected segments so exactly 2000
+        # Calculate the interval between selected segments so exactly 4000
         # segments are sampled from the original list.
-        stride = segment_count / 2000
+        stride = segment_count / 4000
 
-        # A maximum of 2000 segments was chosen as a practical limit to balance
+        # A maximum of 4000 segments was chosen as a practical limit to balance
         # embedding generation time and retaining enough article content.
-        for i in range(2000):
+        for i in range(4000):
             index = int(stride * i)
-            sampled_segments.append(initial_list[index])
+            sampled_segments.append(segment_list[index])
         
-        initial_list = sampled_segments
+        segment_list = sampled_segments
 
-    # Generate embeddings for each article segment and combine them into a
-    # single embedding by averaging the segment embeddings. This creates one
-    # representation of the article's overall content..
-    
-    # Generate embeddings for each article segment. Segments are processed
-    # in batches of 64 to balance processing speed and memory usage.
-    embeddings = embedding_model.encode(
-        initial_list, 
-        batch_size=8, 
-        show_progress_bar=False
+    # Convert each text segment into tokens that the model can understand. 
+    # Padding makes all segments in the batch the same length, while 
+    # truncation prevents segments from exceeding the model's input limit.
+    encoded = tokenizer(
+        segment_list,
+        padding=True,
+        truncation=True,
+        return_tensors="pt"
     )
 
-    # Average the segment embeddings to create a single embedding that
-    # represents the article for model training.
-    average_embedding = np.mean(embeddings, axis=0)
+    # Generate token representations without storing information needed 
+    # for training, since the model is only being used to create embeddings.
+    with torch.no_grad():
+        outputs = embedding_model(**encoded)
 
-    # Perform quality checks on the generated embeddings to identify
-    # potential problems with the extracted article content.
+    # Get the model's output for every token in every segment.
+    # Each token is represented by a vector of 384 numbers.
+    token_embeddings = outputs.last_hidden_state
 
-    suspicious_factors = {}
+    # Get the mask that tells us which tokens are real text (1) and 
+    # which tokens were added as padding (0).
+    attention_mask = encoded["attention_mask"]
 
-    total_word_count = 0
-    for segment in initial_list:
-        total_word_count += len(segment.split())
-    average_word_count = total_word_count / len(initial_list)
+    # Expand the mask so it has the same shape as the token embeddings, 
+    # allowing us to use it to ignore padding when calculating the average.
+    input_mask_expanded = attention_mask.unsqueeze(-1).expand(
+        token_embeddings.size()
+    ).float()
 
-    suspicious_factors = {
-        "too_short": False,
-        "all_zero": False,
-        "extreme_segment_length": False,
-        "low_variance": False
-    }
+    # Multiply each token's vector by its mask: 
+    # real tokens remain unchanged, while padding tokens become zero. 
+    # Then add the remaining token vectors together.
+    embeddings = torch.sum(
+        token_embeddings * input_mask_expanded,
+        dim=1
+    ) / torch.clamp(
+        # Count how many real tokens are in each segment.
+        # This is used to calculate the average instead of the total.
+        input_mask_expanded.sum(dim=1),
+        # Prevent division by zero if a segment contains no real tokens.
+        min=1e-9
+    )
 
-    # Articles with fewer than three segment embeddings may not provide
-    # enough information for reliable analysis.
-    suspicious_factors["too_short"] = embeddings.shape[0] < 3
-
-    # Check whether every embedding value is zero, which may indicate that
-    # embedding generation failed.
-    suspicious_factors["all_zero"] = np.all(embeddings == 0)
-
-    # Flag unusually short or long average segment lengths since they may
-    # indicate problems with article extraction.
-    suspicious_factors["extreme_segment_length"] = not (30 <= average_word_count <= 200)
-
-    # Check whether the embeddings vary very little across segments, which
-    # may indicate that the extracted content lacks meaningful variation.
-    suspicious_factors["low_variance"] = np.var(embeddings, axis=0).mean() <= 0.001
+    # Average the segment embeddings to create one embedding
+    # representing the entire article.
+    article_embedding = embeddings.mean(dim=0)
 
     # Free memory before processing the next article to reduce memory usage
     # during large-scale training.
     del embeddings
-    del initial_list
+    del segment_list
     gc.collect()
 
-    return average_embedding, suspicious_factors
+    # Return the final article embedding.
+    return article_embedding

@@ -3,13 +3,13 @@ logging.set_verbosity_error()
 import os
 import numpy as np
 import pandas as pd
-from backend.preprocessing.text_extraction import get_content, segment_text_and_detect_language, create_embeddings
+from backend.preprocessing.text_extraction import get_content, segment_text_and_detect_language, create_embedding
 import random
-from sentence_transformers import SentenceTransformer
 from multiprocessing import Pool
+from transformers import AutoTokenizer, AutoModel
+import torch
 
-language_model = None
-detection_model = None
+tokenizer = None
 embedding_model = None
 iteration = 0
 
@@ -67,7 +67,6 @@ def main():
     failed_data = [result for result in results if result[0] == "Fail"]
     X_final_data = [result[2][0] for result in results if result[0] == "Success"]
     y_final_data = [result[2][1] for result in results if result[0] == "Success"]
-    language_data = [result[2][2] for result in results if result[0] == "Success"]
 
     # Print summary statistics about the preprocessing pipeline to verify
     # that the dataset was processed successfully and to identify potential
@@ -84,18 +83,18 @@ def main():
     print("-----------------")
 
     new_final_data = list(zip(X_final_data, y_final_data))
-    print(f"Embeddings with invalid shape: {len([individual_article for individual_article in new_final_data if individual_article[0].shape != (768,)])}")
+    print(f"Embeddings with invalid shape: {len([individual_article for individual_article in new_final_data if individual_article[0].shape != (384,)])}")
     print(f"Embeddings with NaN: {len([individual_article for individual_article in new_final_data if np.isnan(individual_article[0]).any()])}")
     print(f"Embeddings with INF: {len([individual_article for individual_article in new_final_data if np.isinf(individual_article[0]).any()])}")
 
-    valid_data = [individual_article for individual_article in new_final_data if (individual_article[0].shape == (768,) and (not np.isnan(individual_article[0]).any()) and (not np.isinf(individual_article[0]).any()))]
+    valid_data = [individual_article for individual_article in new_final_data if (individual_article[0].shape == (384,) and (not np.isnan(individual_article[0]).any()) and (not np.isinf(individual_article[0]).any()))]
     new_final_data = valid_data
     print(f"Length of new data: {len(new_final_data)}")
-    print("-----------------")
-    print("LANGUAGE DATA")
-    print(f"Number of English articles: {len([statistic for statistic in language_data if statistic == 'eng'])}")
-    print(f"Number of non-English articles: {len([statistic for statistic in language_data if statistic != 'eng'])}")
-    print("-----------------")
+
+    zero_count = [zero_label for zero_label in y_final_data if zero_label == 0]
+    one_count = [one_label for one_label in y_final_data if one_label == 1]
+    print(f"Number of fake articles: {zero_count}")
+    print(f"Number of real articles: {one_count}")
 
     # Split the processed dataset into training, validation, and testing
     # datasets for model development and evaluation.
@@ -171,9 +170,9 @@ def main():
 
     # Save each dataset as a NumPy file so it can be loaded directly during
     # model training and evaluation.
-    np.save(os.path.join(DATA_LOCATION, "training_dataset.npy"), training_set, allow_pickle=True)
-    np.save(os.path.join(DATA_LOCATION, "validating_dataset.npy"), validating_set, allow_pickle=True)
-    np.save(os.path.join(DATA_LOCATION, "testing_dataset.npy"), testing_set, allow_pickle=True)
+    np.save(os.path.join(DATA_LOCATION, "new_training_dataset.npy"), training_set, allow_pickle=True)
+    np.save(os.path.join(DATA_LOCATION, "new_validating_dataset.npy"), validating_set, allow_pickle=True)
+    np.save(os.path.join(DATA_LOCATION, "new_testing_dataset.npy"), testing_set, allow_pickle=True)
 
     print("PROCESSING FINISHED SUCCESSFULLY")
 
@@ -196,13 +195,19 @@ def initialize_models():
     # Initialize the models once before processing articles to avoid repeatedly
     # loading large models and slowing down the pipeline.
 
-    global language_model
-    global detection_model
+    global tokenizer
     global embedding_model
+
+    MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
     
-    language_model = None
-    detection_model = None
-    embedding_model = SentenceTransformer("sentence-transformers/all-mpnet-base-v2")
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+
+    embedding_model = AutoModel.from_pretrained(
+        MODEL_NAME,
+        dtype=torch.float16
+    )
+
+    embedding_model.eval()
 
 def process_article_wrapper(article_tuple):
     """
@@ -263,11 +268,11 @@ def process_article(link, label):
     if content is None:
         return "Fail", reason, link
     else:
-        translated_content, _, language = segment_text_and_detect_language(text_list, detection_model)
+        segment_list, _, _ = segment_text_and_detect_language(text_list, None)
 
-        average_embedding, _ = create_embeddings(translated_content, embedding_model)
+        average_embedding = create_embedding(segment_list, tokenizer, embedding_model)
 
-        return "Success", None, (average_embedding, label, language)
+        return "Success", None, (average_embedding, label)
 
 if __name__ == "__main__":
     main()
