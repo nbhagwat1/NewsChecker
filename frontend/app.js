@@ -32,7 +32,7 @@ async function checkArticle() {
 
     try {
         // Send article text to the FastAPI backend for ML inference.
-        const result = await fetch("http://127.0.0.1:8000/check", {
+        const result = await fetch("https://newschecker-50bt.onrender.com/check", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
