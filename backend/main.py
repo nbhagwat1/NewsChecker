@@ -62,7 +62,7 @@ app = FastAPI(lifespan=lifespan)
 
 # Allow requests from the local frontend development server.
 # Required because the frontend and backend run on different ports.
-origins = ["http://127.0.0.1:5500", "http://localhost:5500"]
+origins = ["http://127.0.0.1:5500", "http://localhost:5500", "https://news-checker-kappa.vercel.app"]
 
 # Enables communication between the frontend application and FastAPI backend.
 app.add_middleware(
