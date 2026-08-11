@@ -2,7 +2,7 @@
 
 NewsChecker is an AI-powered fake news detection web application that analyzes online news articles using natural language processing and machine learning to predict whether an article is likely to be real or fake.
 
-**Live Demo:** (link)
+**Live Demo:** https://news-checker-kappa.vercel.app/
 
 ## Table of Contents
 
