@@ -176,7 +176,7 @@ def print_stats(X_train_dataset, X_validate_dataset, X_test_dataset, y_train_dat
     print(f"Test - real (1):", (y_test_dataset==1).sum())
     print("-"*30)
 
-    # Verify that every article embedding has the expected 768-dimensional
+    # Verify that every article embedding has the expected 384-dimensional
     # shape produced by the embedding model before model training.
 
     training_embeddings_are_consistent = all(embedding.shape == (384,) for embedding in X_train_dataset)

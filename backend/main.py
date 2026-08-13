@@ -53,7 +53,8 @@ async def lifespan(app: FastAPI):
         # without the required ML models.
         raise
 
-    # Application runs while paused at this point. Cleanup code executes after shutdown.
+    # Yield control to FastAPI while the application is running.
+    # Code after this point executes when the application shuts down.
     yield
 
     print("Shutting down")
@@ -97,7 +98,7 @@ def check(article: NewsArticle):
         text_list = [article.text]
 
         # Prepare user-provided article text for inference by splitting it
-        # into segments and detecting the language before embedding generation.
+        # into smaller segments before embedding generation.
         segments, _, _ = segment_text_and_detect_language(text_list, None)
 
         # Convert processed article segments into fixed-size embeddings

@@ -505,7 +505,7 @@ def segment_text_and_detect_language(segment_list, detection_model):
     for paragraph in segment_list:
         word_count = len(paragraph.split())
 
-        # Split article text into segments of up to 300 words to keep each
+        # Split article text into segments of up to 150 words to keep each
         # segment within the input size limitations of the embedding model.
         if word_count < 150:
             initial_list.append(paragraph)
@@ -546,6 +546,32 @@ def segment_text_and_detect_language(segment_list, detection_model):
     return initial_list, None, language
 
 def create_embedding(segment_list, tokenizer, embedding_model):
+    """
+    Generates a single embedding representing an entire article.
+
+    The function tokenizes the article's text segments, generates token-level
+    embeddings using the provided embedding model, applies mean pooling to
+    ignore padding tokens, and averages the resulting segment embeddings into
+    one article-level embedding.
+
+    If an article contains more than 4,000 text segments, stride-based
+    sampling is used to reduce the number of segments while maintaining
+    coverage of the article. The embedding model is used only to generate
+    features and is not trained, so gradient tracking is disabled to reduce
+    memory usage.
+
+    Args:
+        segment_list (list[str]): Valid text segments extracted from an article.
+        tokenizer: Tokenizer corresponding to the embedding model.
+        embedding_model: Pretrained model used to generate token embeddings.
+
+    Returns:
+        torch.Tensor: A single embedding representing the entire article.
+
+    Raises:
+        ValueError: If no valid text segments are provided.
+    """
+
     # Embeddings cannot be generated without at least one valid text segment.
     if not segment_list:
         raise ValueError("No valid text segments found")

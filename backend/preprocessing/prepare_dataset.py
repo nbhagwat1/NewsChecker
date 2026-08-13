@@ -27,9 +27,8 @@ def main():
     a 70/15/15 split. Each dataset is verified to contain both real and fake
     news examples before being saved as NumPy files for later model training.
 
-    The function also reports preprocessing statistics, including successful
-    and failed article extractions, embedding quality issues, and detected
-    article languages.
+    The function also reports preprocessing statistics, including successful and
+    failed article extractions and embedding quality issues.
 
     Args:
         None
@@ -61,9 +60,8 @@ def main():
     pool.join()
 
     # Separate successful and failed processing results. Store the
-    # successfully processed article segments, their corresponding target
-    # labels, and detected languages in separate lists, while storing
-    # failed articles in their own list.
+    # successfully processed article embeddings and their corresponding
+    # target labels, while storing failed articles in their own list.
     failed_data = [result for result in results if result[0] == "Fail"]
     X_final_data = [result[2][0] for result in results if result[0] == "Success"]
     y_final_data = [result[2][1] for result in results if result[0] == "Success"]
@@ -180,10 +178,10 @@ def initialize_models():
     """
     Initializes the machine learning models required by the pipeline.
 
-    This function loads the language detection model and the sentence
-    embedding model used during article processing. The models are initialized
-    once and stored globally so they can be reused across multiple article
-    processing tasks without repeatedly loading large model files.
+    This function loads the tokenizer and sentence embedding model used during
+    article processing. The models are initialized once and stored globally so
+    they can be reused across multiple article processing tasks without repeatedly
+    loading large model files.
 
     Args:
         None
@@ -228,10 +226,10 @@ def process_article_wrapper(article_tuple):
             or failed ("Fail").
         str: Error message explaining why processing failed, or None if
             processing was successful.
-        tuple[np.ndarray, int, str] | str: Processing output returned by 
-            the article processing function, containing the article 
-            embedding, label, and detected language on success, or the 
-            failed article URL otherwise.
+        tuple[np.ndarray, int] | str: Processing output returned by the
+            article processing function, containing the article embedding
+            and its binary truthfulness label on success, or the failed 
+            article URL otherwise.
     """
 
     return process_article(article_tuple[0], article_tuple[1])
@@ -255,10 +253,10 @@ def process_article(link, label):
             or failed ("Fail").
         str: Error message explaining why processing failed, or None if
             the pipeline completed successfully.
-        tuple[np.ndarray, int, str] | str: A tuple containing the article 
-            embedding, its binary truthfulness label, and detected language 
-            if processing succeeds. Otherwise, contains the URL of the 
-            article that failed processing.
+        tuple[np.ndarray, int] | str: A tuple containing the article 
+            embedding and its binary truthfulness label if processing
+            succeeds. Otherwise, contains the URL of the article that
+            failed processing.
     """
 
     global iteration
