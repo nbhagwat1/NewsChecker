@@ -26,7 +26,7 @@ The training set was used to train the model, the validation set was used to eva
 
 ### Class Distribution
 
-The processed dataset contains 2,495 fake news articles and 8,544 real news articles. As a result, the dataset is imbalanced, with substantially more real news articles than fake news articles. The table below shows the number of fake and real news articles in each dataset:
+The processed dataset contains 2,645 fake news articles and 10,234 real news articles. As a result, the dataset is imbalanced, with substantially more real news articles than fake news articles. The table below shows the number of fake and real news articles in each dataset:
 
 | Dataset    | Fake Articles (0) | Real Articles (1) | Total  |
 | :-----:    | :---------------: | :---------------: | :---:  |
@@ -65,7 +65,7 @@ The model was trained using **scikit-learn's** `LogisticRegression` class.
 
 The following hyperparameters were used during training:
 - `max_iter=1000` to give the model enough opportunities to learn from the training data before stopping.
-- `class_weight='balanced'` to account for the dataset's imbalance between fake and real news articles (approximately 23% fake and 77% real), helping the model learn from both classes more fairly.
+- `class_weight='balanced'` to account for the dataset's imbalance between fake and real news articles (approximately 20.5% fake and 79.5% real), helping the model learn from both classes more fairly.
 
 ### Predictions
 
@@ -90,7 +90,7 @@ Making a prediction for a news article usually takes a few seconds. Most of this
 
 ## Evaluation
 
-The trained model was evaluated using a test dataset of 1,933 articles. Of those articles, 379 (23.1%) were fake news articles and 1,554 (76.9%) were real news articles. The model's performance was evaluated using the following classification metrics: accuracy, precision, recall, F1-score, and ROC-AUC.
+The trained model was evaluated using a test dataset of 1,933 articles. Of those articles, 379 (19.6%) were fake news articles and 1,554 (80.4%) were real news articles. The model's performance was evaluated using the following classification metrics: accuracy, precision, recall, F1-score, and ROC-AUC.
 
 ### Metric Interpretation
 

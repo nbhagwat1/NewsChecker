@@ -90,7 +90,7 @@ Once the model was trained, the preprocessing pipeline was no longer needed duri
 
 **Backend:** FastAPI
 
-**Machine Learning:** Scikit-learn, SentenceTransformers (all-MiniLM-L6-v2)
+**Machine Learning:** Scikit-learn, Transformers (all-MiniLM-L6-v2)
 
 **Data Processing & Web Scraping:** NumPy, Pandas, BeautifulSoup, Requests
 
@@ -117,7 +117,7 @@ flowchart TD
 
 ### 1. Training Pipeline (Offline / One-Time)
 
-Executed once during model development. Not used by the deployed application.
+Executed offline during model development to prepare the dataset and train the model. Not used by the deployed application.
 
 ```mermaid
 flowchart TD
@@ -150,7 +150,7 @@ flowchart TD
     A[User Inputs Article Text]
     B[Frontend<br/>HTML, CSS, JavaScript]
     C[FastAPI Backend]
-    D[Generate Text Embedding<br/>SentenceTransformers]
+    D[Generate Text Embedding<br/>Transformers]
     E[Load Trained Logistic Regression Model]
     F[Classify Text Embedding]
     G[Return Prediction + Confidence Score]
