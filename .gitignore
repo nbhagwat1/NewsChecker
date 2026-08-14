@@ -145,6 +145,7 @@ env.bak/
 venv.bak/
 new_env/
 another_venv/
+additional_venv/
 
 # Spyder project settings
 .spyderproject
