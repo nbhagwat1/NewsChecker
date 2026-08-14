@@ -13,9 +13,9 @@ def main():
     label.
 
     The function also identifies the most frequently predicted class and
-    reports the proportion of testing samples assigned to that class.
-    These statistics help identify prediction bias or class imbalance in
-    the model's output.
+    reports the proportion of testing samples assigned to that class as 
+    a decimal. These statistics help identify prediction bias or class 
+    imbalance in the model's output.
 
     Args:
         None

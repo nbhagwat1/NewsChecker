@@ -1,37 +1,57 @@
 import psutil
 from sentence_transformers import SentenceTransformer
 
-process = psutil.Process()
+def main():
+    """
+    Measures memory usage while loading a SentenceTransformer model
+    and generates embeddings for sample text.
 
-MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+    This function records the process's memory usage before and after
+    loading the all-MiniLM-L6-v2 model. It then generates embeddings
+    for two sample texts and prints the shape of the resulting
+    embeddings.
 
-print(
-    f"Memory before model: "
-    f"{process.memory_info().rss / 1024 / 1024:.2f} MB",
-    flush=True
-)
+    Args:
+        None
 
-print("Loading MiniLM...", flush=True)
+    Returns:
+        None
+    """
+    
+    process = psutil.Process()
 
-model = SentenceTransformer(
-    MODEL_NAME,
-    model_kwargs={"torch_dtype": "float16"}
-)
+    MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-print(
-    f"Memory after model: "
-    f"{process.memory_info().rss / 1024 / 1024:.2f} MB",
-    flush=True
-)
+    print(
+        f"Memory before model: "
+        f"{process.memory_info().rss / 1024 / 1024:.2f} MB",
+        flush=True
+    )
 
-texts = [
-    "This is a test article about technology and artificial intelligence.",
-    "The weather is expected to remain sunny throughout the weekend.",
-]
+    print("Loading MiniLM...", flush=True)
 
-embeddings = model.encode(
-    texts,
-    show_progress_bar=False
-)
+    model = SentenceTransformer(
+        MODEL_NAME,
+        model_kwargs={"torch_dtype": "float16"}
+    )
 
-print(f"Embedding shape: {embeddings.shape}", flush=True)
+    print(
+        f"Memory after model: "
+        f"{process.memory_info().rss / 1024 / 1024:.2f} MB",
+        flush=True
+    )
+
+    texts = [
+        "This is a test article about technology and artificial intelligence.",
+        "The weather is expected to remain sunny throughout the weekend.",
+    ]
+
+    embeddings = model.encode(
+        texts,
+        show_progress_bar=False
+    )
+
+    print(f"Embedding shape: {embeddings.shape}", flush=True)
+
+if __name__ == "__main__":
+    main()

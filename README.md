@@ -6,13 +6,13 @@ NewsChecker is an AI-powered fake news detection web application that analyzes o
 
 ## Table of Contents
 
-- Project Overview
-- Screenshots
-- Features
-- Tech Stack
-- Architecture Diagram
-- How to Run Locally
-- Future Improvements
+- [Project Overview](#project-overview)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Architecture Diagram](#architecture-diagram)
+- [How to Run Locally](#how-to-run-locally)
+- [Future Improvements](#future-improvements)
 
 ## Project Overview
 
@@ -50,17 +50,23 @@ Once the model was trained, the preprocessing pipeline was no longer needed duri
 
 *Figure 2. A news article is entered into the input field before analysis.*
 
+### Processing State
+
+![Processing State](images/processing.png)
+
+*Figure 3. The processing state displayed after the user submits an article while NewsChecker analyzes its contents.*
+
 ### Classification Results Displayed
 
 ![Classification Results Displayed](images/result.png)
 
-*Figure 3. After submission, the application displays the predicted label and confidence score.*
+*Figure 4. After submission, the application displays the predicted label and confidence score.*
 
 ### Empty Submission Error Message
 
 ![Empty Submission Error Message](images/error.png)
 
-*Figure 4. If the user submits the form without entering article text, the application displays an error message.*
+*Figure 5. If the user submits the form without entering article text, the application displays an error message.*
 
 ## Features
 
@@ -84,11 +90,13 @@ Once the model was trained, the preprocessing pipeline was no longer needed duri
 
 **Backend:** FastAPI
 
-**Machine Learning:** Scikit-learn, SentenceTransformers
+**Machine Learning:** Scikit-learn, SentenceTransformers (all-MiniLM-L6-v2)
 
-**Data Processing & Web Scraping:** NumPy, Pandas, BeautifulSoup
+**Data Processing & Web Scraping:** NumPy, Pandas, BeautifulSoup, Requests
 
-**Development Environment:** Jupyter Notebook, VS Code
+**Deployment:** Vercel, Render
+
+**Development Tools:** Jupyter Notebook, VS Code
 
 **Version Control:** Git, GitHub
 

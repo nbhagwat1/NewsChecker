@@ -1,36 +1,66 @@
 import psutil
 
-process = psutil.Process()
+def memory(label, process):
+    """
+    Prints the current memory usage of a process.
 
-def memory(label):
+    Args:
+        label (str): Description identifying the point at which memory
+            usage is measured.
+        process: Process whose memory usage will be measured.
+
+    Returns:
+        None
+    """
+    
     print(
         f"{label}: "
         f"{process.memory_info().rss / 1024 / 1024:.2f} MB",
         flush=True
     )
 
-memory("Before imports")
+def main():
+    """
+    Measures the application's memory usage as major dependencies are imported.
 
-import fastapi
-memory("After fastapi")
+    This function records the process's memory usage before importing
+    dependencies and after each major import. The measurements help identify
+    which dependencies contribute most to the application's memory usage.
 
-from fastapi.middleware.cors import CORSMiddleware
-memory("After CORS")
+    Args:
+        None
 
-from contextlib import asynccontextmanager
-memory("After contextlib")
+    Returns:
+        None
+    """
+    
+    process = psutil.Process()
 
-from sentence_transformers import SentenceTransformer
-memory("After sentence-transformers")
+    memory("Before imports", process)
 
-import joblib
-memory("After joblib")
+    import fastapi
+    memory("After fastapi", process)
 
-from backend.preprocessing.text_extraction import (
-    segment_text_and_detect_language,
-    create_embeddings
-)
-memory("After text_extraction")
+    from fastapi.middleware.cors import CORSMiddleware
+    memory("After CORS", process)
 
-from pydantic import BaseModel, Field
-memory("After pydantic")
+    from contextlib import asynccontextmanager
+    memory("After contextlib", process)
+
+    from sentence_transformers import SentenceTransformer
+    memory("After sentence-transformers", process)
+
+    import joblib
+    memory("After joblib", process)
+
+    from backend.preprocessing.text_extraction import (
+        segment_text_and_detect_language,
+        create_embedding
+    )
+    memory("After text_extraction", process)
+
+    from pydantic import BaseModel, Field
+    memory("After pydantic", process)
+
+if __name__ == "__main__":
+    main()

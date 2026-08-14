@@ -4,16 +4,14 @@ import torch
 
 def print_segments_chronologically(segments):
     """
-    Prints each text segment in the order it appears in the list.
+    Prints text segments in the order they appear in the input list.
 
-    This function iterates through the input list of text segments and
-    prints each segment together with its position in the list. It is
-    primarily intended as a debugging utility for inspecting article
-    content after preprocessing.
+    Each segment is printed with its position in the list. This function
+    is intended as a debugging utility for inspecting the text produced
+    during preprocessing.
 
     Args:
-        segments (list[str]): A list of text segments in the order they
-            appear in the article.
+        segments (list[str]): Text segments to display.
 
     Returns:
         None
@@ -27,14 +25,15 @@ def print_segments_chronologically(segments):
 
 def examine_embedding_generation():
     """
-    Demonstrates the text segmentation and embedding generation pipeline.
+    Tests the text segmentation and embedding generation pipeline.
 
-    This function creates sample article text, splits it into segments of
-    up to 300 words, prints the resulting segments, generates a semantic
-    embedding for the article, and prints both the embedding and the
-    embedding quality information. It is intended as a debugging utility
-    for verifying that text segmentation and embedding generation behave
-    as expected.
+    This function creates sample article text, loads the
+    all-MiniLM-L6-v2 model, segments the sample text, and generates
+    an embedding representing the article. The resulting segments
+    and embedding are printed for inspection.
+
+    This function is intended as a debugging utility for verifying
+    that text segmentation and embedding generation work as expected.
 
     Args:
         None
@@ -48,7 +47,9 @@ def examine_embedding_generation():
     ]
 
     MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-    
+
+    # Load the tokenizer and model used to turn the sample text
+    # into numerical representations of its meaning.
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
     model = AutoModel.from_pretrained(
@@ -57,33 +58,38 @@ def examine_embedding_generation():
     )
 
     model.eval()
-    
+
+    # Split the sample article into smaller text segments before
+    # generating its embedding.
     segments = examine_text_segmentation_and_language_detection(sample_list)
+
     print(f"Sample list: {sample_list}\n")
+
     for segment_index, segment in enumerate(segments):
         print(f"Index {segment_index}: {segment}")
+
     print("\n")
+
+    # Generate one embedding representing the entire article from
+    # the individual text segments.
     embeddings = create_embedding(segments, tokenizer, model)
+
     print("Embeddings:")
     print(embeddings)
 
 def examine_text_segmentation_and_language_detection(paragraph_list):
     """
-    Segments article text and detects its language.
+    Tests the article text segmentation process.
 
-    This function processes a list of article paragraphs by splitting the
-    text into segments of up to 300 words and detecting the language of the
-    article content. It returns both the generated text segments and the
-    detected language.
+    This function passes article paragraphs through the text
+    segmentation and language detection pipeline and returns the
+    resulting text segments.
 
     Args:
-        paragraph_list (list[str]): A list of article paragraphs to be
-            segmented and analyzed.
+        paragraph_list (list[str]): Article paragraphs to process.
 
     Returns:
-        list[str]: A list of text segments containing the article content,
-            with each segment limited to approximately 300 words.
-        str: The detected language code of the article text.
+        list[str]: Text segments produced from the input paragraphs.
     """
 
     segment_list, _, _ = segment_text_and_detect_language(paragraph_list, None)
@@ -91,25 +97,21 @@ def examine_text_segmentation_and_language_detection(paragraph_list):
 
 def create_and_print_embeddings(segment_list):
     """
-    Tests and displays the article embedding generation process.
+    Generates and prints a single embedding representing an article.
 
-    This function takes a list of article text segments, generates a single
-    semantic embedding that represents the article content, and prints the
-    generated embedding along with a dictionary containing checks for
-    suspicious embedding characteristics, such as insufficient content,
-    invalid values, unusual segment lengths, or low variation.
+    This function takes a list of article text segments, generates a
+    semantic embedding representing the article content, and prints
+    the resulting embedding.
 
     Args:
-        segment_list (list[str]): A list of text segments that together make
-            up the article content.
+        segment_list (list[str]): Text segments that make up the article.
 
     Returns:
         None
     """
 
-    embeddings, suspicious_factors = create_embedding(segment_list)
-    print(embeddings)
-    print(suspicious_factors)
+    embedding = create_embedding(segment_list)
+    print(embedding)
 
 def main():
     """
@@ -127,14 +129,13 @@ def main():
         None
     """
 
-    '''
+    # Use a real article to test whether the content extraction
+    # pipeline can successfully retrieve its main text.
     article_link = "https://www.npr.org/2026/01/05/nx-s1-5667078/maduro-indictment-hearing-underway"
+    
     article_text, _, _, _, _ = get_content(article_link)
 
     print(article_text)
-    '''
-
-    examine_embedding_generation()
 
 if __name__ == "__main__":
     main()
